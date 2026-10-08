@@ -73,5 +73,5 @@ Rules inherited from C4 owner decisions:
 | Thai and English both present | Thai shown as primary name, English/common as secondary line |
 
 `src/data/catalog.ts` deliberately ships one Thai-only record (`mungbean-thai-only`) and one
-English-only record (`soil-health-programme`) so these states are visible in review instead of
-being a theoretical promise.
+English-only record (`cover-crop-trial`) so **both** fallback directions are visible in review
+instead of being a theoretical promise; the QA gate asserts that both badges render.

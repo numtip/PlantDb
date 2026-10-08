@@ -144,7 +144,7 @@ const t = useTranslations(locale);
 <BaseLayout locale={locale} title={\`\${t.states.notFoundTitle} — PlantDb\`} description={t.states.notFoundBody} noindex>
   <section class="section">
     <div class="shell shell--wide">
-      <States locale={locale} kind="notfound" />
+      <States locale={locale} kind="notfound" as="h1" />
     </div>
   </section>
 </BaseLayout>

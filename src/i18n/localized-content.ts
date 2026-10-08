@@ -65,6 +65,8 @@ export function resolveLocalized(
       shownLocale: requested,
     };
   }
+  // the source-locale copy, then any locale that actually has text (a null placeholder
+  // for a missing locale must not shadow a locale that does have a value)
   const source = text[SOURCE_LOCALE];
   if (source) {
     return {
@@ -74,14 +76,14 @@ export function resolveLocalized(
       shownLocale: source.locale,
     };
   }
-  const anyLocale = Object.keys(text)[0] as Locale | undefined;
-  if (anyLocale && text[anyLocale]) {
-    const fallback = text[anyLocale]!;
+  for (const key of Object.keys(text) as Locale[]) {
+    const candidate = text[key];
+    if (!candidate) continue;
     return {
-      text: fallback.value,
-      isFallback: true,
-      isUnreviewed: fallback.reviewStatus !== 'approved',
-      shownLocale: fallback.locale,
+      text: candidate.value,
+      isFallback: candidate.locale !== requested,
+      isUnreviewed: candidate.reviewStatus !== 'approved',
+      shownLocale: candidate.locale,
     };
   }
   return null;

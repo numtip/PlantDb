@@ -40,10 +40,18 @@ jobs:
       - name: Install Chromium for the search test
         run: npx playwright install --with-deps chromium
 
-      - name: Serve the build and run the search functional test (both locales)
+      - name: Search functional test (both locales, real browser)
         run: |
-          npx astro preview --port 8099 &
-          for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:8099/PlantDb/ && break; sleep 1; done
+          mkdir -p /tmp/c5-serve
+          ln -sfn "$PWD/dist" /tmp/c5-serve/PlantDb
+          python3 -m http.server 8099 --directory /tmp/c5-serve >/tmp/c5-serve.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -sf -o /dev/null http://127.0.0.1:8099/PlantDb/; then break; fi
+            sleep 1
+          done
+          if ! curl -sf -o /dev/null http://127.0.0.1:8099/PlantDb/; then
+            echo "static server failed to start"; cat /tmp/c5-serve.log; exit 1
+          fi
           node scripts/test-search.mjs 8099
 
       - name: Upload build + QA evidence

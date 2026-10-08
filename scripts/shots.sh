@@ -18,9 +18,9 @@ ln -s "$ROOT/dist" "$SERVE/PlantDb"
 sleep 2
 
 shoot() { # $1 name  $2 path  $3 width  $4 height
-  "$CHROME" --headless=new --no-sandbox --hide-scrollbars --disable-gpu \
-    --force-device-scale-factor=1 --window-size="$3,$4" \
-    --screenshot="$OUT/$1.png" "http://127.0.0.1:$PORT/PlantDb$2" >/dev/null 2>&1
+  "$CHROME" --headless=new --no-sandbox --hide-scrollbars --disable-gpu --force-prefers-reduced-motion \
+    --force-device-scale-factor=1 \
+    --window-size="$3,$4" --screenshot="$OUT/$1.png" "http://127.0.0.1:$PORT/PlantDb$2" >/dev/null 2>&1
   printf '  %s (%sx%s)\n' "$1.png" "$3" "$4"
 }
 

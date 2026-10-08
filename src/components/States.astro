@@ -10,8 +10,11 @@ interface Props {
   locale: Locale;
   kind: 'empty' | 'error' | 'notfound';
   query?: string;
+  /** heading level — the 404 page uses States as the page's primary heading (h1) */
+  as?: 'h1' | 'h2';
 }
-const { locale, kind, query } = Astro.props;
+const { locale, kind, query, as = 'h2' } = Astro.props;
+const Heading = as;
 const t = useTranslations(locale);
 const map = {
   empty: { title: t.states.emptyTitle, body: t.states.emptyBody, cta: t.labels.filterClear, href: localePath(locale, 'search') },
@@ -24,7 +27,7 @@ const map = {
   <span class="state__mark" aria-hidden="true">
     {kind === 'empty' ? '◌' : kind === 'error' ? '⚠' : '∅'}
   </span>
-  <h2>{map.title}</h2>
+  <Heading>{map.title}</Heading>
   <p>{map.body}</p>
   {query ? <p class="state__query"><code>{query}</code></p> : null}
   <p><a class="btn btn--ghost" href={map.href}>{map.cta}</a></p>

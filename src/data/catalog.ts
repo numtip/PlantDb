@@ -54,8 +54,9 @@ export type DemoItem = {
   };
 };
 
-const L = (th: string, en: string | null, provenance: string): LocalizedText => {
-  const out: LocalizedText = { th: makeLocalized(th, 'th', provenance) };
+const L = (th: string | null, en: string | null, provenance: string): LocalizedText => {
+  const out: LocalizedText = {};
+  if (th !== null) out.th = makeLocalized(th, 'th', provenance);
   if (en !== null) out.en = makeLocalized(en, 'en', provenance);
   return out;
 };
@@ -291,6 +292,23 @@ export const items: DemoItem[] = [
     media: { legacyPath: null, published: false },
     publication: { state: 'published' },
     provenance: { source: 'demo-fixture', contentStatus: 'demo-placeholder', reviewed: false, note: 'synthetic' },
+  },
+  // English-only on purpose: exercises the *reverse* fallback direction, so the Thai page
+  // must show the English source text with the "no translation yet" badge (never hide the record).
+  {
+    legacyId: 914, slug: 'cover-crop-trial', kind: 'research', categorySlug: 'breeding',
+    scientificName: '—', family: '—', tags: ['cover crop', 'soil'],
+    name: L(null, 'Cover-crop trial (demo)', 'demo:item:914'),
+    commonName: L(null, 'Research', 'demo:item:914'),
+    summary: L(null, 'An English-only record kept in the demo set so the Thai site can show the fallback state.', 'demo:item:914'),
+    characteristics: L(null, 'Three replicated plots (sample).', 'demo:item:914'),
+    origin: L(null, 'Design placeholder text.', 'demo:item:914'),
+    agency: L(null, 'Office of Agricultural Research and Extension (example)', 'demo:item:914'),
+    people: L(null, 'Researcher D (demo).', 'demo:item:914'),
+    notes: L(null, 'English-only fixture — the Thai page shows the source-language badge.', 'demo:item:914'),
+    media: { legacyPath: null, published: false },
+    publication: { state: 'published' },
+    provenance: { source: 'demo-fixture', contentStatus: 'demo-placeholder', reviewed: false, note: 'synthetic, english-only' },
   },
 ];
 

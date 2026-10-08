@@ -91,6 +91,8 @@ for (const file of htmlFiles) {
     bad('canonical-value', `${rel(file)} canonical=${canonical} expected≈${expectedCanonical}`);
   }
   const wantHreflang = isNoindex ? [] : ['th', 'en', 'x-default'];
+  counters.hreflangChecked += alts.length;
+  if (canonical) counters.canonicalChecked += 1;
   const haveHreflang = alts.map((a) => a.hreflang);
   for (const want of wantHreflang) {
     if (!haveHreflang.includes(want)) bad('hreflang-missing', `${rel(file)} missing hreflang="${want}"`);
@@ -144,6 +146,35 @@ for (const file of htmlFiles) {
   const hasThai = /[\u0E00-\u0E7F]/.test(html);
   if (locale === 'th' && !hasThai) bad('thai-copy', `${rel(file)} has no Thai characters`);
   page.hasThai = hasThai;
+
+  // 10. exactly one h1 per page (document outline / a11y)
+  const h1s = html.match(/<h1[\s>]/g) ?? [];
+  if (h1s.length !== 1) bad('h1-count', `${rel(file)} has ${h1s.length} <h1> elements (expected exactly 1)`);
+
+  // 11. untranslated records must be shown with the source-language badge, never hidden
+  //     (a badge is only expected on the locale that lacks the text)
+  const thaiOnlyRecord = url.includes('mungbean-thai-only');
+  const englishOnlyRecord = url.includes('cover-crop-trial');
+  const needsFallbackBadge = (locale === 'en' && thaiOnlyRecord) || (locale === 'th' && englishOnlyRecord);
+  const hasFallbackBadge = /<span class="badge"[^>]*>\s*⚠︎/.test(html);
+  if (needsFallbackBadge && !hasFallbackBadge) {
+    bad('fallback-badge', `${rel(file)} shows an untranslated record without the source-language badge`);
+  }
+  if (needsFallbackBadge && hasFallbackBadge) {
+    if (locale === 'th') page.thFallback = true;
+    if (locale === 'en') page.enFallback = true;
+  }
+}
+
+// ---------- 4b. both fallback directions are actually exercised ----------
+{
+  const enWithBadge = pages.filter((p) => p.enFallback).map((p) => p.url);
+  const thWithBadge = pages.filter((p) => p.thFallback).map((p) => p.url);
+  if (enWithBadge.length > 0 && thWithBadge.length > 0) {
+    ok('fallback-directions', `th-only record falls back on EN (${enWithBadge.length} page), en-only record falls back on TH (${thWithBadge.length} page)`);
+  } else {
+    bad('fallback-directions', `fallback policy not exercised in both directions: EN-badge=${enWithBadge.length}, TH-badge=${thWithBadge.length}`);
+  }
 }
 
 // ---------- 5. route parity ----------

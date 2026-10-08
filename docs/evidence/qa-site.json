@@ -1,29 +1,34 @@
 {
-  "generatedAt": "2026-10-08T20:26:53.300Z",
+  "generatedAt": "2026-10-08T20:43:58.059Z",
   "site": {
     "site": "https://numtip.github.io",
     "base": "/PlantDb",
-    "pages": 60,
+    "pages": 62,
     "locales": [
       "th",
       "en"
     ]
   },
-  "assertions": 5,
+  "assertions": 6,
   "counters": {
-    "linksChecked": 2194,
-    "assetsChecked": 182,
-    "hreflangChecked": 0,
-    "canonicalChecked": 0
+    "linksChecked": 2274,
+    "assetsChecked": 188,
+    "hreflangChecked": 180,
+    "canonicalChecked": 60
   },
-  "passed": 5,
+  "passed": 6,
   "failed": 0,
   "problems": [],
   "checks": [
     {
+      "name": "fallback-directions",
+      "status": "PASS",
+      "detail": "th-only record falls back on EN (1 page), en-only record falls back on TH (1 page)"
+    },
+    {
       "name": "route-parity",
       "status": "PASS",
-      "detail": "29 routes exist in both locales"
+      "detail": "30 routes exist in both locales"
     },
     {
       "name": "explorer",
@@ -38,12 +43,12 @@
     {
       "name": "sitemap",
       "status": "PASS",
-      "detail": "29 URLs, all resolvable, all with th/en/x-default alternates"
+      "detail": "30 URLs, all resolvable, all with th/en/x-default alternates"
     },
     {
       "name": "sitemap-coverage",
       "status": "PASS",
-      "detail": "29 sitemap URLs ≥ 29 pages"
+      "detail": "30 sitemap URLs ≥ 30 pages"
     }
   ]
 }

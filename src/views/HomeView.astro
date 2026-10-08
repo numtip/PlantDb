@@ -5,6 +5,7 @@ import BotanicalPlate from '../components/BotanicalPlate.astro';
 import { interpolate, useTranslations, type Locale } from '../i18n/ui';
 import { localePath } from '../i18n/urls';
 import { catalogueStats, itemsOfKind, rootCategories } from '../data/catalog';
+import { resolveLocalized } from '../i18n/localized-content';
 
 interface Props { locale: Locale; }
 const { locale } = Astro.props;
@@ -144,14 +145,18 @@ const animals = itemsOfKind('animal');
       <p class="lead">{t.collections.research.lead}</p>
     </div>
     <div class="research-strip">
-      {highlights.map((item) => (
+      {highlights.map((item) => {
+        const itemName = resolveLocalized(item.name, locale);
+        const itemSummary = resolveLocalized(item.summary, locale);
+        return (
         <article class="research-card reveal">
-          <h3><a href={localePath(locale, `research/${item.slug}`)}>{item.name[locale]?.value ?? item.name.th?.value}</a></h3>
+          <h3><a href={localePath(locale, `research/${item.slug}`)}>{itemName?.text}</a></h3>
           <p class="scientific" lang="la">{item.scientificName !== '—' ? item.scientificName : ''}</p>
-          <p>{item.summary[locale]?.value ?? item.summary.th?.value}</p>
+          <p>{itemSummary?.text}</p>
           <p class="research-card__cta"><a href={localePath(locale, `research/${item.slug}`)}>{t.labels.viewDetail} →</a></p>
         </article>
-      ))}
+        );
+      })}
     </div>
     <p class="section__foot"><a class="btn btn--ghost" href={localePath(locale, 'research')}>{t.labels.exploreCollection}</a></p>
   </div>
