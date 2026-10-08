@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate route tree
+        run: node scripts/gen-routes.mjs
+
+      - name: Type + template check
+        run: npx astro check
+
+      - name: TH/EN dictionary parity
+        run: node --experimental-strip-types scripts/test-i18n.mjs
+
+      - name: Build (static)
+        run: npm run build
+
+      - name: Functional QA (lang / canonical / hreflang / links / locale parity / sitemap)
+        run: node scripts/qa-site.mjs
+
+      - name: Install Chromium for the search test
+        run: npx playwright install --with-deps chromium
+
+      - name: Serve the build and run the search functional test (both locales)
+        run: |
+          npx astro preview --port 8099 &
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:8099/PlantDb/ && break; sleep 1; done
+          node scripts/test-search.mjs 8099
+
+      - name: Upload build + QA evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: plantdb-site-dist
+          path: |
+            dist
+            docs/evidence/qa-site.json
+          retention-days: 14

@@ -1,0 +1,77 @@
+---
+import Explorer from '../components/Explorer.astro';
+import CategoryCard from '../components/CategoryCard.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import type { Crumb } from '../lib/types';
+import { interpolate, useTranslations, type Locale } from '../i18n/ui';
+import { localePath } from '../i18n/urls';
+import { categories, categoryPath, childCategories, itemsInCategoryTree, itemsOfKind, type ItemKind, type Category } from '../data/catalog';
+import { resolveLocalized } from '../i18n/localized-content';
+
+interface Props { locale: Locale; kind: ItemKind; categorySlug?: string; }
+const { locale, kind, categorySlug } = Astro.props;
+const t = useTranslations(locale);
+
+const collectionKey = kind === 'plant' ? 'plants' : kind === 'animal' ? 'animals' : 'research';
+const collection = t.collections[collectionKey];
+const basePath = kind === 'plant' ? 'plants' : kind === 'animal' ? 'animals' : 'research';
+
+const cat = categorySlug ? categories.find((c) => c.slug === categorySlug) : undefined;
+const catName = cat ? resolveLocalized(cat.name, locale)?.text ?? cat.slug : undefined;
+const trail: Crumb[] = [];
+if (cat) {
+  for (const slug of categoryPath(cat.slug)) {
+    const node = categories.find((c) => c.slug === slug)!;
+    trail.push({
+      label: resolveLocalized(node.name, locale)?.text ?? slug,
+      href: localePath(locale, `${basePath}/category/${slug}`),
+    });
+  }
+  const last = trail.pop()!;
+  trail.push({ label: last.label });
+}
+
+const scoped = cat ? itemsInCategoryTree(cat.slug) : itemsOfKind(kind);
+const subs: Category[] = cat ? childCategories(cat.slug) : categories.filter((c) => c.kind === kind && c.parentSlug === null);
+const title = catName ?? collection.title;
+const lead = cat ? collection.lead : collection.lead;
+---
+
+<section class="cat-hero">
+  <div class="shell shell--wide">
+    <Breadcrumbs locale={locale} trail={trail.length ? trail : [{ label: collection.title }]} />
+    <div class="cat-hero__row">
+      <div>
+        <p class="eyebrow">{t.labels.catalogue}</p>
+        <h1>{title}</h1>
+        <p class="lead">{lead}</p>
+        <p class="cat-hero__count">{interpolate(t.labels.itemCount, { count: scoped.length })}</p>
+      </div>
+      {subs.length ? (
+        <div class="cat-hero__subs">
+          <p class="eyebrow">{t.labels.exploreCategories}</p>
+          <div class="cat-grid">
+            {subs.map((c) => <CategoryCard category={c} locale={locale} />)}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  </div>
+</section>
+
+<section class="section section--tight">
+  <div class="shell shell--wide">
+    <Explorer locale={locale} kind={kind} initialCategory={cat?.slug} />
+  </div>
+</section>
+
+<style>
+  .cat-hero { padding-block: var(--space-l) var(--space-m); border-block-end: 1px solid var(--line); background: linear-gradient(180deg, var(--ivory-warm), var(--ivory)); }
+  .cat-hero__row { display: grid; gap: var(--space-l); }
+  @media (min-width: 62rem) {
+    .cat-hero__row { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); align-items: start; }
+  }
+  .cat-hero h1 { max-width: 24ch; }
+  .cat-hero__count { color: var(--bronze-deep); font-size: var(--step--1); letter-spacing: 0.08em; text-transform: uppercase; }
+  .cat-grid { display: grid; gap: 0.6rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); }
+</style>

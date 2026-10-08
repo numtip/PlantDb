@@ -1,0 +1,257 @@
+---
+import ItemCard from '../components/ItemCard.astro';
+import CategoryCard from '../components/CategoryCard.astro';
+import BotanicalPlate from '../components/BotanicalPlate.astro';
+import { interpolate, useTranslations, type Locale } from '../i18n/ui';
+import { localePath } from '../i18n/urls';
+import { catalogueStats, itemsOfKind, rootCategories } from '../data/catalog';
+
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+
+const featured = [...itemsOfKind('plant').slice(0, 3), ...itemsOfKind('animal').slice(0, 1)];
+const highlights = itemsOfKind('research').slice(0, 2);
+const animals = itemsOfKind('animal');
+---
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero__art" aria-hidden="true">
+    <svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" focusable="false">
+      <defs>
+        <linearGradient id="hero-g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#173d32" />
+          <stop offset="58%" stop-color="#1d4a3c" />
+          <stop offset="100%" stop-color="#0f2a22" />
+        </linearGradient>
+      </defs>
+      <rect width="1200" height="800" fill="url(#hero-g)" />
+      <g opacity="0.22" fill="#b9c99a">
+        <ellipse cx="980" cy="250" rx="120" ry="300" transform="rotate(-18 980 250)" />
+        <ellipse cx="1080" cy="330" rx="90" ry="260" transform="rotate(-28 1080 330)" />
+        <ellipse cx="880" cy="360" rx="70" ry="200" transform="rotate(8 880 360)" />
+      </g>
+      <path d="M0 640 C 240 560 420 600 640 660 C 860 720 1040 700 1200 650 L1200 800 L0 800Z" fill="#0f2a22" opacity="0.55" />
+      <path d="M0 720 C 260 660 460 700 700 740 C 920 776 1060 760 1200 730 L1200 800 L0 800Z" fill="#0f2a22" opacity="0.75" />
+    </svg>
+  </div>
+  <div class="shell shell--wide hero__inner">
+    <div class="hero__copy">
+      <p class="eyebrow hero__eyebrow">{t.hero.eyebrow}</p>
+      <h1 class="hero__title">
+        {t.hero.title.split(' ').map((phrase) => <span class="phrase">{phrase}</span>)}
+      </h1>
+      <p class="lead hero__lead">{t.hero.lead}</p>
+
+      <form class="hero__search" role="search" action={localePath(locale, 'search')} method="get" aria-label={t.a11y.searchForm}>
+        <label class="visually-hidden" for="hero-q">{t.hero.searchLabel}</label>
+        <input id="hero-q" name="q" type="search" placeholder={t.hero.searchPlaceholder} autocomplete="off" />
+        <button class="btn btn--bronze" type="submit">{t.nav.search}</button>
+      </form>
+
+      <div class="hero__actions">
+        <a class="btn" href={localePath(locale, 'plants')}>{t.hero.cta}</a>
+        <a class="btn btn--ghost hero__ghost" href={localePath(locale, 'about')}>{t.hero.ctaSecondary}</a>
+      </div>
+
+      <dl class="hero__stats">
+        <div><dt>{t.collections.plants.title}</dt><dd>{interpolate(t.labels.itemCount, { count: catalogueStats.plants })}</dd></div>
+        <div><dt>{t.collections.animals.title}</dt><dd>{interpolate(t.labels.itemCount, { count: catalogueStats.animals })}</dd></div>
+        <div><dt>{t.collections.research.title}</dt><dd>{interpolate(t.labels.itemCount, { count: catalogueStats.research })}</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ============ THREE COLLECTIONS ============ -->
+<section class="section">
+  <div class="shell shell--wide">
+    <div class="section__head reveal">
+      <p class="eyebrow">{t.labels.catalogue}</p>
+      <h2>{t.labels.exploreCollection}</h2>
+    </div>
+    <div class="collections">
+      <a class="collection collection--plants reveal" href={localePath(locale, 'plants')}>
+        <BotanicalPlate seed="collection-plants" variant="wide" label={null} />
+        <span class="collection__body">
+          <span class="collection__kicker">{interpolate(t.labels.itemCount, { count: catalogueStats.plants })}</span>
+          <span class="collection__title">{t.collections.plants.title}</span>
+          <span class="collection__lead">{t.collections.plants.lead}</span>
+        </span>
+      </a>
+      <a class="collection collection--animals reveal" href={localePath(locale, 'animals')}>
+        <BotanicalPlate seed="collection-animals" variant="wide" label={null} tone="bronze" />
+        <span class="collection__body">
+          <span class="collection__kicker">{interpolate(t.labels.itemCount, { count: catalogueStats.animals })}</span>
+          <span class="collection__title">{t.collections.animals.title}</span>
+          <span class="collection__lead">{t.collections.animals.lead}</span>
+        </span>
+      </a>
+      <a class="collection collection--research reveal" href={localePath(locale, 'research')}>
+        <BotanicalPlate seed="collection-research" variant="wide" label={null} tone="forest" />
+        <span class="collection__body">
+          <span class="collection__kicker">{interpolate(t.labels.itemCount, { count: catalogueStats.research })}</span>
+          <span class="collection__title">{t.collections.research.title}</span>
+          <span class="collection__lead">{t.collections.research.lead}</span>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURED (asymmetric editorial) ============ -->
+<section class="section section--tint">
+  <div class="shell shell--wide">
+    <div class="split split--flip">
+      <div class="reveal">
+        <p class="eyebrow">{t.labels.catalogue}</p>
+        <h2>{t.collections.plants.title}</h2>
+        <p class="lead">{t.collections.plants.lead}</p>
+        <p><a class="btn btn--ghost" href={localePath(locale, 'plants')}>{t.labels.exploreCategories}</a></p>
+        <div class="cat-grid">
+          {rootCategories('plant').map((c) => <CategoryCard category={c} locale={locale} />)}
+        </div>
+      </div>
+      <div class="grid-auto editorial-offset">
+        {featured.map((item) => <ItemCard item={item} locale={locale} />)}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ANIMALS strip ============ -->
+<section class="section">
+  <div class="shell shell--wide">
+    <div class="section__head reveal">
+      <p class="eyebrow">{t.labels.catalogue}</p>
+      <h2>{t.collections.animals.title}</h2>
+      <p class="lead">{t.collections.animals.lead}</p>
+    </div>
+    <div class="grid-auto">
+      {animals.slice(0, 3).map((item) => <ItemCard item={item} locale={locale} />)}
+    </div>
+    <p class="section__foot"><a class="btn btn--ghost" href={localePath(locale, 'animals')}>{t.labels.exploreCollection}</a></p>
+  </div>
+</section>
+
+<!-- ============ RESEARCH (forest band) ============ -->
+<section class="section section--forest">
+  <div class="shell shell--wide">
+    <div class="section__head reveal">
+      <p class="eyebrow">{t.labels.catalogue}</p>
+      <h2>{t.collections.research.title}</h2>
+      <p class="lead">{t.collections.research.lead}</p>
+    </div>
+    <div class="research-strip">
+      {highlights.map((item) => (
+        <article class="research-card reveal">
+          <h3><a href={localePath(locale, `research/${item.slug}`)}>{item.name[locale]?.value ?? item.name.th?.value}</a></h3>
+          <p class="scientific" lang="la">{item.scientificName !== '—' ? item.scientificName : ''}</p>
+          <p>{item.summary[locale]?.value ?? item.summary.th?.value}</p>
+          <p class="research-card__cta"><a href={localePath(locale, `research/${item.slug}`)}>{t.labels.viewDetail} →</a></p>
+        </article>
+      ))}
+    </div>
+    <p class="section__foot"><a class="btn btn--ghost" href={localePath(locale, 'research')}>{t.labels.exploreCollection}</a></p>
+  </div>
+</section>
+
+<!-- ============ ABOUT teaser ============ -->
+<section class="section section--tight">
+  <div class="shell shell--wide">
+    <div class="about-teaser reveal">
+      <div>
+        <p class="eyebrow">{t.labels.aboutProject}</p>
+        <h2>{t.about.sectionProject}</h2>
+        <p class="lead">{t.about.lead}</p>
+      </div>
+      <p><a class="btn" href={localePath(locale, 'about')}>{t.labels.aboutProject}</a></p>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ---------- hero ---------- */
+  .hero { position: relative; color: var(--ivory); overflow: clip; }
+  .hero__art { position: absolute; inset: 0; }
+  .hero__art svg { width: 100%; height: 100%; }
+  .hero__inner { position: relative; padding-block: clamp(3.5rem, 10vw, 7.5rem) clamp(3rem, 8vw, 6rem); }
+  .hero__copy { max-width: 46rem; }
+  .hero__eyebrow { color: var(--sage) !important; }
+  .hero__title { color: var(--ivory); font-size: var(--step-5); max-width: 30ch; }
+  /* Thai words must not be broken mid-word (browsers break Thai anywhere): keep each
+     dictionary phrase on one line and let the line break only between phrases. */
+  .hero__title .phrase { display: inline-block; margin-inline-end: 0.26em; }
+  html[lang='th'] .hero__title { font-size: clamp(1.55rem, 6vw, 3.9rem); max-width: 26ch; }
+  .hero__lead { color: rgba(246, 243, 233, 0.88); max-width: 52ch; }
+  .hero__search { display: flex; gap: var(--space-2xs); flex-wrap: wrap; margin-block: var(--space-m) var(--space-s); }
+  .hero__search input {
+    flex: 1 1 18rem;
+    font: inherit;
+    padding: 0.9rem 1.2rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgba(246, 243, 233, 0.35);
+    background: rgba(246, 243, 233, 0.96);
+    color: var(--ink);
+  }
+  .hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-2xs); }
+  .hero__ghost { --btn-fg: var(--ivory) !important; border-color: rgba(246, 243, 233, 0.5) !important; }
+  .hero__ghost:hover { --btn-bg: rgba(246, 243, 233, 0.12) !important; --btn-fg: var(--ivory) !important; }
+  .hero__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-m) var(--space-xl);
+    margin: var(--space-l) 0 0;
+    padding-block-start: var(--space-s);
+    border-block-start: 1px solid rgba(246, 243, 233, 0.25);
+  }
+  .hero__stats dt { font-size: var(--step--1); letter-spacing: 0.12em; text-transform: uppercase; color: var(--sage); }
+  .hero__stats dd { margin: 0.2rem 0 0; font-family: var(--font-display); font-size: var(--step-1); }
+
+  /* ---------- sections ---------- */
+  .section__head { max-width: 58ch; margin-block-end: var(--space-l); }
+  .section__foot { margin-block-start: var(--space-l); }
+  .collections { display: grid; gap: var(--grid-gap); grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); }
+  .collection {
+    position: relative;
+    display: block;
+    border-radius: var(--radius-l);
+    overflow: hidden;
+    text-decoration: none;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    transition: transform var(--dur-mid) var(--ease-organic), box-shadow var(--dur-mid) var(--ease-organic);
+  }
+  .collection:hover { transform: translateY(-4px); box-shadow: var(--shadow-lift); }
+  .collection__body { display: grid; gap: 0.35rem; padding: var(--space-m); }
+  .collection__kicker { font-size: var(--step--1); color: var(--bronze-deep); letter-spacing: 0.1em; text-transform: uppercase; }
+  .collection__title { font-family: var(--font-display); font-size: var(--step-2); color: var(--forest); }
+  html[lang='th'] .collection__title { font-family: var(--font-thai-display); }
+  .collection__lead { color: var(--ink-soft); font-size: var(--step--1); }
+
+  .cat-grid { display: grid; gap: 0.6rem; margin-block-start: var(--space-m); }
+
+  .research-strip { display: grid; gap: var(--grid-gap); grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); }
+  .research-card {
+    border: 1px solid rgba(246, 243, 233, 0.24);
+    border-radius: var(--radius-l);
+    padding: var(--space-m);
+    background: rgba(246, 243, 233, 0.06);
+  }
+  .research-card p { color: rgba(246, 243, 233, 0.86); }
+  .research-card__cta a { color: var(--sage) !important; text-decoration: none; font-weight: 600; }
+
+  .about-teaser {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-m);
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-l);
+    padding: clamp(1.5rem, 4vw, var(--space-xl));
+    background: var(--surface);
+  }
+  .about-teaser > div { max-width: 52ch; }
+</style>

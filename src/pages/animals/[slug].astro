@@ -1,0 +1,21 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import DetailView from '@/views/DetailView.astro';
+import { publishedItems } from '@/data/catalog';
+import { resolveLocalized } from '@/i18n/localized-content';
+import { useTranslations } from '@/i18n/ui';
+
+export function getStaticPaths() {
+  return publishedItems.filter((i) => i.kind === 'animal').map((i) => ({ params: { slug: i.slug }, props: { item: i } }));
+}
+
+const locale = 'th';
+const { item } = Astro.props;
+const t = useTranslations(locale);
+const name = resolveLocalized(item.name, locale)?.text ?? item.slug;
+const summary = resolveLocalized(item.summary, locale)?.text ?? t.hero.lead;
+---
+
+<BaseLayout locale={locale} title={`${name} — PlantDb`} description={summary} path={`animals/${item.slug}/`}>
+  <DetailView locale={locale} item={item} />
+</BaseLayout>

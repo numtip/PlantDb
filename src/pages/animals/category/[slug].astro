@@ -1,0 +1,20 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import CatalogueView from '@/views/CatalogueView.astro';
+import { categories } from '@/data/catalog';
+import { resolveLocalized } from '@/i18n/localized-content';
+import { useTranslations } from '@/i18n/ui';
+
+export function getStaticPaths() {
+  return categories.filter((c) => c.kind === 'animal').map((c) => ({ params: { slug: c.slug }, props: { category: c } }));
+}
+
+const locale = 'th';
+const { category } = Astro.props;
+const t = useTranslations(locale);
+const name = resolveLocalized(category.name, locale)?.text ?? category.slug;
+---
+
+<BaseLayout locale={locale} title={`${name} — PlantDb`} description={t.collections.animals.lead} path={`animals/category/${category.slug}/`}>
+  <CatalogueView locale={locale} kind="animal" categorySlug={category.slug} />
+</BaseLayout>

@@ -1,0 +1,37 @@
+---
+/**
+ * State components — empty / error / loading.
+ * They are real, styled experiences (owner requirement #7), not browser defaults.
+ */
+import { useTranslations, type Locale } from '../i18n/ui';
+import { localePath } from '../i18n/urls';
+
+interface Props {
+  locale: Locale;
+  kind: 'empty' | 'error' | 'notfound';
+  query?: string;
+}
+const { locale, kind, query } = Astro.props;
+const t = useTranslations(locale);
+const map = {
+  empty: { title: t.states.emptyTitle, body: t.states.emptyBody, cta: t.labels.filterClear, href: localePath(locale, 'search') },
+  error: { title: t.states.errorTitle, body: t.states.errorBody, cta: t.states.backHome, href: localePath(locale) },
+  notfound: { title: t.states.notFoundTitle, body: t.states.notFoundBody, cta: t.states.backHome, href: localePath(locale) },
+}[kind];
+---
+
+<section class="state reveal" role={kind === 'error' ? 'alert' : 'status'}>
+  <span class="state__mark" aria-hidden="true">
+    {kind === 'empty' ? '◌' : kind === 'error' ? '⚠' : '∅'}
+  </span>
+  <h2>{map.title}</h2>
+  <p>{map.body}</p>
+  {query ? <p class="state__query"><code>{query}</code></p> : null}
+  <p><a class="btn btn--ghost" href={map.href}>{map.cta}</a></p>
+</section>
+
+<style>
+  .state__mark { display: block; font-size: 2.4rem; color: var(--bronze); line-height: 1; margin-block-end: var(--space-2xs); }
+  .state__query { color: var(--muted); }
+  .state__query code { background: rgba(23,61,50,.06); padding: 0.1rem 0.4rem; border-radius: var(--radius-s); }
+</style>

@@ -1,0 +1,17 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import CatalogueView from '@/views/CatalogueView.astro';
+import { useTranslations } from '@/i18n/ui';
+
+const locale = 'en';
+const t = useTranslations(locale);
+---
+
+<BaseLayout
+  locale={locale}
+  title={t.seo.animalsTitle}
+  description={t.seo.animalsDesc}
+  path="animals/"
+>
+  <CatalogueView locale={locale} kind="animal" />
+</BaseLayout>

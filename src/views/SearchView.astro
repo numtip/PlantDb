@@ -1,0 +1,33 @@
+---
+import Explorer from '../components/Explorer.astro';
+import { useTranslations, type Locale } from '../i18n/ui';
+import { publishedItems } from '../data/catalog';
+
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const q = Astro.url.searchParams.get('q') ?? '';
+---
+
+<section class="search-hero">
+  <div class="shell shell--wide">
+    <p class="eyebrow">{t.labels.catalogue}</p>
+    <h1>{t.nav.search}</h1>
+    <p class="lead">{t.seo.searchDesc}</p>
+    <p class="search-hero__hint">{t.hero.searchPlaceholder} · {t.labels.keyboardHint}</p>
+    {q ? <p class="search-hero__q">{t.labels.searchResultsFor.replace('{term}', q)}</p> : null}
+  </div>
+</section>
+
+<section class="section section--tight">
+  <div class="shell shell--wide">
+    <Explorer locale={locale} />
+  </div>
+</section>
+
+<style>
+  .search-hero { padding-block: var(--space-l) var(--space-m); border-block-end: 1px solid var(--line); background: linear-gradient(180deg, var(--ivory-warm), var(--ivory)); }
+  .search-hero h1 { max-width: 20ch; }
+  .search-hero__hint { color: var(--muted); font-size: var(--step--1); }
+  .search-hero__q { font-weight: 600; color: var(--forest); }
+</style>

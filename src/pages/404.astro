@@ -1,0 +1,16 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import States from '@/components/States.astro';
+import { useTranslations } from '@/i18n/ui';
+
+const locale = 'th';
+const t = useTranslations(locale);
+---
+
+<BaseLayout locale={locale} title={`${t.states.notFoundTitle} — PlantDb`} description={t.states.notFoundBody} noindex>
+  <section class="section">
+    <div class="shell shell--wide">
+      <States locale={locale} kind="notfound" />
+    </div>
+  </section>
+</BaseLayout>

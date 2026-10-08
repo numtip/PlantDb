@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-10-08T20:26:53.300Z",
+  "site": {
+    "site": "https://numtip.github.io",
+    "base": "/PlantDb",
+    "pages": 60,
+    "locales": [
+      "th",
+      "en"
+    ]
+  },
+  "assertions": 5,
+  "counters": {
+    "linksChecked": 2194,
+    "assetsChecked": 182,
+    "hreflangChecked": 0,
+    "canonicalChecked": 0
+  },
+  "passed": 5,
+  "failed": 0,
+  "problems": [],
+  "checks": [
+    {
+      "name": "route-parity",
+      "status": "PASS",
+      "detail": "29 routes exist in both locales"
+    },
+    {
+      "name": "explorer",
+      "status": "PASS",
+      "detail": "30 catalogue/search pages expose the search+filter explorer"
+    },
+    {
+      "name": "explorer-labels",
+      "status": "PASS",
+      "detail": "30 pages embed a localized label payload"
+    },
+    {
+      "name": "sitemap",
+      "status": "PASS",
+      "detail": "29 URLs, all resolvable, all with th/en/x-default alternates"
+    },
+    {
+      "name": "sitemap-coverage",
+      "status": "PASS",
+      "detail": "29 sitemap URLs ≥ 29 pages"
+    }
+  ]
+}
