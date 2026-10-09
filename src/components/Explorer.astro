@@ -23,32 +23,6 @@ const t = useTranslations(locale);
 const scoped = kind ? publishedItems.filter((i) => i.kind === kind) : publishedItems;
 const kindCategories = categories.filter((c) => (kind ? c.kind === kind : true));
 
-const docs = scoped.map((item) => {
-  const name = resolveLocalized(item.name, locale)?.text ?? item.slug;
-  const nameTh = resolveLocalized(item.name, 'th')?.text ?? '';
-  const nameEn = resolveLocalized(item.name, 'en')?.text ?? '';
-  const common = resolveLocalized(item.commonName, locale)?.text ?? '';
-  const catPath = categories.find((c) => c.slug === item.categorySlug);
-  return {
-    slug: item.slug,
-    kind: item.kind,
-    category: item.categorySlug,
-    categoryLabel: catPath ? resolveLocalized(catPath.name, locale)?.text ?? catPath.slug : item.categorySlug,
-    name,
-    common,
-    scientific: item.scientificName,
-    tags: item.tags.map((x) => x.trim()).join(' '),
-    haystack: [name, nameTh, nameEn, common, item.scientificName, item.family, item.tags.join(' ')]
-      .join(' ')
-      .normalize('NFC')
-      .toLowerCase(),
-    url: localePath(
-      locale,
-      `${item.kind === 'plant' ? 'plants' : item.kind === 'animal' ? 'animals' : 'research'}/${item.slug}`,
-    ),
-  };
-});
-
 const labels = {
   placeholder: t.hero.searchPlaceholder,
   searchLabel: t.hero.searchLabel,

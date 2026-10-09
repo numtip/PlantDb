@@ -2,7 +2,7 @@
   "id": "en-detail-desktop",
   "url": "http://127.0.0.1:8098/PlantDb/en/plants/rice-oryza/",
   "formFactor": "desktop",
-  "fetchedAt": "2026-10-09T01:26:05.446Z",
+  "fetchedAt": "2026-10-09T01:44:36.460Z",
   "lighthouseVersion": "13.5.0",
   "threshold": 90,
   "scores": {
@@ -18,7 +18,7 @@
     "largest-contentful-paint": "0.3 s",
     "total-blocking-time": "0 ms",
     "cumulative-layout-shift": "0",
-    "speed-index": "0.4 s",
+    "speed-index": "0.3 s",
     "interactive": "0.3 s"
   },
   "failingAudits": [
@@ -39,12 +39,6 @@
       "title": "Document request latency",
       "score": 0.5,
       "displayValue": "Est savings of 18 KiB"
-    },
-    {
-      "id": "forced-reflow-insight",
-      "title": "Forced reflow",
-      "score": 0,
-      "displayValue": null
     },
     {
       "id": "network-dependency-tree-insight",

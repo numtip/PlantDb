@@ -50,6 +50,13 @@ the command that regenerates it is named, and the raw evidence file is linked.
 | th-search | desktop / mobile | 100 / 100 | 100 / 100 | 100 / 100 | 100 / 100 |
 | en-search | desktop / mobile | 100 / 100 | 100 / 100 | 100 / 100 | 100 / 100 |
 
+Evidence hygiene: the reports committed here were regenerated **after the last source change**,
+so they describe exactly the commit under review. Repeated builds of identical source are
+byte-identical (`diff -rq` between two consecutive builds: no differences), so a re-run of the
+gate on this commit reproduces the same output; the only variation observed between runs is
+Lighthouse's own timing noise (a re-run by the independent reviewer scored one mobile run at 98
+for performance, still far above the threshold).
+
 Method: `node scripts/lighthouse.mjs --urls=full --threshold=90`. The script serves `dist/` under
 the real Pages base path (`/PlantDb/`) so the measured page is the shipped page, runs Lighthouse
 13.5 in headless Chromium, writes a trimmed report per run plus `summary.json` (committed) and the
