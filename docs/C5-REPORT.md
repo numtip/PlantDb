@@ -154,6 +154,17 @@ desktop/mobile × 4 page types, every category 100), the eight defects it found 
 (4× colour contrast, accessible-name mismatch, relative hreflang, heading order, plus a gate
 blind spot), and a 9/9 mutation test proving the gate fails when something real breaks.
 
+Independent verification of that gate (separate subagent, isolated copy, adversarial):
+**PASS_WITH_FLAGS** — it reproduced every functional and safety claim (QA 0 failures, i18n 119=119,
+search 9/9, all 16 Lighthouse evidence files cross-checked against the raw reports with no
+mismatches), ran 7 mutations of its own (all detected), and reproduced Lighthouse ≥90 on a fresh run
+(one mobile run at 98). Its flags were documentation-accuracy issues only (an off-by-one mutation
+count, a "CI green" reading taken while a run was still pending, and the "min 100" wording); all
+three are corrected in the current `docs/QA-MATRIX.md`.
+
+Jev decision for this checkpoint: **`ready_for_owner_merge_approval`, confidence 0.92**
+(ready 0.95 · hold 0.05 · reject 0.00) — record `40-Decisions/2026-10-09-jev-ask-plantdb-c5-pre-merge-quality-gat-ready-for-owner-.md`.
+
 **Status: `READY_FOR_OWNER_MERGE_APPROVAL`** — nothing was merged, GitHub Pages stays
 unconfigured, the default branch was not changed, and no deployment was performed.
 

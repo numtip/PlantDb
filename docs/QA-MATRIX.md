@@ -2,6 +2,7 @@
 
 **Verdict:** `READY_FOR_OWNER_MERGE_APPROVAL`
 **Branch:** `feat/c5-bilingual-site` → **PR #1** https://github.com/numtip/PlantDb/pull/1
+**Evidence commit:** `db6659b` (branch head; CI green at this commit)
 **Measured:** 2026-10-09, VPS 10.1.254.237, Astro 5 static build (62 pages: 31 th + 31 en)
 **Touch nothing outside review:** production untouched · **no merge** · **no GitHub Pages** · **no default-branch change** · **no deploy**
 
@@ -17,7 +18,7 @@ the command that regenerates it is named, and the raw evidence file is linked.
 | 1 | Static build | ✓ | ✓ | — | — | **62 pages, 0 errors** | `npm run build` |
 | 2 | Types / templates | ✓ | ✓ | — | — | **0 errors, 0 warnings** | `npx astro check` |
 | 3 | UI dictionary parity | ✓ | ✓ | — | — | **119 = 119 keys, 0 orphans** | `npm run test:i18n` |
-| 4 | Internal links | ✓ | ✓ | — | — | **2274 resolved, 0 broken** | `docs/evidence/qa-site.json` |
+| 4 | Internal links | ✓ | ✓ | — | — | **2274 href occurrences checked, 0 broken** (count includes repeated and absolute hrefs) | `docs/evidence/qa-site.json` |
 | 5 | Asset references | ✓ | ✓ | — | — | **188 resolved, 0 missing** | same |
 | 6 | `lang` attribute | ✓ | ✓ | — | — | **62/62 correct** | same |
 | 7 | Canonical URLs | ✓ | ✓ | — | — | **60/60 locale-correct** | same |
@@ -29,13 +30,13 @@ the command that regenerates it is named, and the raw evidence file is linked.
 | 13 | Demo-data provenance | ✓ | ✓ | — | — | **26 detail pages show demo provenance; 0 migrated/legacy records** | same |
 | 14 | Third-party URLs | ✓ | ✓ | — | — | **0 (own origin + 2 XML namespaces only)** | same → `no-third-party-urls` |
 | 15 | Secrets | ✓ | ✓ | — | — | **0 in tree and in git history; GitHub secret-scanning alerts = []** | `gh api repos/numtip/PlantDb/secret-scanning/alerts` |
-| 16 | Lighthouse Performance | ✓ | ✓ | ✓ | ✓ | **100 (min over 16 runs)** | `docs/evidence/lighthouse/summary.json` |
-| 17 | Lighthouse Accessibility | ✓ | ✓ | ✓ | ✓ | **100 (min over 16 runs)** | same |
-| 18 | Lighthouse Best Practices | ✓ | ✓ | ✓ | ✓ | **100 (min over 16 runs)** | same |
-| 19 | Lighthouse SEO | ✓ | ✓ | ✓ | ✓ | **100 (min over 16 runs)** | same |
+| 16 | Lighthouse Performance | ✓ | ✓ | ✓ | ✓ | **100 in the committed 16-run evidence; independent re-run reproduced ≥90 (min observed 98)** | `docs/evidence/lighthouse/summary.json` |
+| 17 | Lighthouse Accessibility | ✓ | ✓ | ✓ | ✓ | **100 in all 16 runs; reproduced independently** | same |
+| 18 | Lighthouse Best Practices | ✓ | ✓ | ✓ | ✓ | **100 in all 16 runs; reproduced independently** | same |
+| 19 | Lighthouse SEO | ✓ | ✓ | ✓ | ✓ | **100 in all 16 runs; reproduced independently** | same |
 | 20 | Screenshot evidence | ✓ | ✓ | ✓ | ✓ | **23 captures at 1440 / 834 / 390 px** | `docs/screenshots/` (+ full set locally) |
-| 21 | CI | ✓ | ✓ | — | — | **green: build+QA, search, Lighthouse jobs** | `gh pr checks 1` |
-| 22 | Gate is load-bearing | — | — | — | — | **9/9 deliberate breakages detected, exit=1 each** | §4 mutation test |
+| 21 | CI | ✓ | ✓ | — | — | **green at `db6659b`: 4 checks pass** — job `build-and-qa` (the search test is a *step* inside it) and job `lighthouse`, each passing on both the push and PR runs | `gh pr checks 1` |
+| 22 | Gate is load-bearing | — | — | — | — | **10/10 deliberate breakages detected, exit=1 each** (independent reviewer added 7 more of its own, all detected) | §4 mutation test |
 
 ## 2. Lighthouse detail (threshold 90, run 2026-10-09)
 
@@ -93,7 +94,10 @@ Throw-away copy in `/tmp`, one deliberate breakage at a time:
 | missing asset (favicon) | exit=1 `internal-link` |
 | broken locale-switch target | exit=1 `internal-link` |
 
-Baseline (untouched copy): exit=0, 0 failures.
+Baseline (untouched copy): exit=0, 0 failures. The independent reviewer ran a further **7 mutations
+of its own choosing** (wrong canonical, missing hreflang target, removed `x-default`, broken link,
+heading jump, stripped demo provenance, injected third-party URL) — all 7 produced exit=1 on a copy,
+with the original tree untouched.
 
 ## 5. Remaining issues and known limits (nothing hidden)
 
@@ -106,7 +110,15 @@ Baseline (untouched copy): exit=0, 0 failures.
 7. **Repository housekeeping pending owner decision:** the repo was empty, so an empty `main` was created purely to allow a PR; the default branch is still `feat/c5-bilingual-site`.
 8. **Real data not yet integrated.** This preview is static demo content; wiring the migrated dataset behind the localized content contract is the next phase and will require its own QA gate.
 
-## 6. Reproduce everything
+## 6. Independent verification and decisions
+
+| Item | Actor | Result |
+| --- | --- | --- |
+| Adversarial re-verification of this matrix | separate subagent (isolated copy in `/tmp`, tree never written) | **PASS_WITH_FLAGS** — every functional and safety claim reproduced (QA 0 failures, i18n 119=119, search 9/9, all 16 Lighthouse evidence files cross-checked against the raw reports with **no mismatches**); it ran 7 mutations of its own, all detected; it reproduced Lighthouse ≥90 on a fresh run. Its flags were **documentation accuracy only** (mutation-count off-by-one, a stale "CI green" reading taken while the second CI run was still pending, and the "min 100" wording) — all corrected in this revision |
+| Pre-merge disposition | Jev (TypeSafe System One, `mode=ask`) | **`ready_for_owner_merge_approval`** · confidence **0.92** · probabilities: ready 0.95 · hold 0.05 · reject 0.00 · record: `40-Decisions/2026-10-09-jev-ask-plantdb-c5-pre-merge-quality-gat-ready-for-owner-.md` |
+| Merge / Pages | **nobody** | not merged (`mergedAt` null), Pages API 404 (unconfigured), default branch unchanged, no deploy |
+
+## 7. Reproduce everything
 
 ```bash
 npm ci
