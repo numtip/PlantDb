@@ -1,0 +1,54 @@
+---
+import BotanicalPlate from './BotanicalPlate.astro';
+import { resolveLocalized } from '../i18n/localized-content';
+import { useTranslations, type Locale } from '../i18n/ui';
+import { localePath } from '../i18n/urls';
+import type { DemoItem } from '../data/catalog';
+
+interface Props {
+  item: DemoItem;
+  locale: Locale;
+  categoryLabel?: string;
+  /** heading level: h3 under a section heading (home), h2 in catalogue/search grids */
+  headingLevel?: 2 | 3;
+}
+const { item, locale, categoryLabel, headingLevel = 3 } = Astro.props;
+const Heading = `h${headingLevel}` as 'h2' | 'h3';
+const t = useTranslations(locale);
+
+const name = resolveLocalized(item.name, locale);
+const common = resolveLocalized(item.commonName, locale);
+const fallback = name?.isFallback ?? false;
+const unreviewed = name?.isUnreviewed ?? false;
+const href = localePath(locale, `${item.kind === 'plant' ? 'plants' : item.kind === 'animal' ? 'animals' : 'research'}/${item.slug}`);
+const altText = t.a11y.imageOf.replace('{name}', name?.text ?? item.slug);
+---
+
+<article class="card item-card reveal">
+  <a class="item-card__link" href={href} aria-label={`${name?.text ?? item.slug} — ${t.labels.viewDetail}`}>
+    <BotanicalPlate seed={item.slug} label={altText} tone={item.kind === 'plant' ? 'sage' : item.kind === 'animal' ? 'bronze' : 'forest'} />
+  </a>
+  <div class="card__body">
+    <p class="card__meta">
+      {categoryLabel ? <span class="item-card__cat">{categoryLabel}</span> : null}
+      {unreviewed ? <span class="badge">{t.labels.demoContent}</span> : null}
+    </p>
+    <Heading class="card__title"><a href={href}>{name?.text ?? item.slug}</a></Heading>
+    {fallback ? <p class="item-card__fallback">⚠︎ {t.labels.originalLanguage}</p> : null}
+    <p class="scientific" lang="la">{item.scientificName}</p>
+    {common && common.text !== name?.text ? <p class="card__meta">{common.text}</p> : null}
+    <p class="item-card__cta"><a href={href}>{t.labels.viewDetail} →</a></p>
+  </div>
+</article>
+
+<style>
+  .item-card__link { display: block; color: inherit; text-decoration: none; }
+  .item-card__cat { color: var(--bronze-deep); font-weight: 600; letter-spacing: 0.04em; }
+  .card__meta { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+  .card__title a { color: var(--forest); text-decoration: none; }
+  .card__title a:hover { text-decoration: underline; }
+  .item-card__cta { margin: auto 0 0; font-weight: 600; font-size: var(--step--1); }
+  .item-card__cta a { text-decoration: none; color: var(--bronze-deep); }
+  .item-card__fallback { font-size: var(--step--1); color: var(--bronze-deep); margin: 0; }
+  .scientific { margin: 0; font-size: var(--step--1); }
+</style>

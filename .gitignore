@@ -1,0 +1,18 @@
+# build output
+dist/
+.astro/
+node_modules/
+
+# evidence / scratch
+# (docs/evidence/*.json and docs/screenshots/*.png ARE committed as review evidence;
+#  the full-resolution local screenshot set and the raw Lighthouse reports are not.)
+/screenshots/
+/lighthouse-raw/
+*.local
+
+# never publish raw production references or secrets
+references/
+.env
+.env.*
+*.pem
+*.key

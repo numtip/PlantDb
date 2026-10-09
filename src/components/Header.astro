@@ -1,0 +1,198 @@
+---
+import { useTranslations, localeNames, type Locale } from '../i18n/ui';
+import { localePath, switchLocaleHref, isActive } from '../i18n/urls';
+
+interface Props { locale: Locale; pathname: string; fallbackToHome?: boolean; }
+const { locale, pathname, fallbackToHome = false } = Astro.props;
+const t = useTranslations(locale);
+const other: Locale = locale === 'th' ? 'en' : 'th';
+
+const nav = [
+  { href: localePath(locale, 'plants'), label: t.nav.plants },
+  { href: localePath(locale, 'animals'), label: t.nav.animals },
+  { href: localePath(locale, 'research'), label: t.nav.research },
+  { href: localePath(locale, 'about'), label: t.nav.about },
+];
+
+// preserve the current query string when switching language (owner directive §1)
+// on error pages there is no counterpart page, so the switcher falls back to that locale's home
+const query = Astro.url.search;
+const switchHref = (fallbackToHome ? localePath(other) : switchLocaleHref(pathname, other)) + query;
+const searchHref = localePath(locale, 'search');
+---
+
+<header class="site-header" data-header>
+  <div class="shell shell--wide header__inner">
+    <a class="brand" href={localePath(locale)} aria-label={`${t.meta.siteShort}, Maejo University — ${t.nav.home}`}>
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="30" height="30" focusable="false">
+          <path d="M16 2c6 4 9 8 9 13 0 6-4 11-9 15-5-4-9-9-9-15 0-5 3-9 9-13Z" fill="currentColor" opacity=".9" />
+          <path d="M16 8v18M16 13l-5-3M16 17l5-3" stroke="#f6f3e9" stroke-width="1.4" fill="none" stroke-linecap="round" />
+        </svg>
+      </span>
+      <span class="brand__text">
+        <strong>{t.meta.siteShort}</strong>
+        <small>Maejo University</small>
+      </span>
+    </a>
+
+    <button
+      class="nav-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="primary-nav"
+      data-nav-toggle
+    >
+      <span class="visually-hidden">{t.nav.menu}</span>
+      <span class="nav-toggle__bars" aria-hidden="true"><i></i><i></i><i></i></span>
+    </button>
+
+    <nav id="primary-nav" class="nav" aria-label={t.a11y.mainNav} data-nav>
+      <ul class="nav__list">
+        {nav.map((link) => (
+          <li>
+            <a href={link.href} aria-current={isActive(pathname, link.href) ? 'page' : undefined}>{link.label}</a>
+          </li>
+        ))}
+        <li>
+          <a class="nav__search" href={searchHref} aria-current={isActive(pathname, searchHref) ? 'page' : undefined}>
+            <svg viewBox="0 0 20 20" width="17" height="17" aria-hidden="true" focusable="false">
+              <circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8" />
+              <path d="m13 13 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+            {t.nav.search}
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="header__aside">
+      <a class="locale-switch" href={switchHref} hreflang={other} lang={other} aria-label={`${t.nav.languageSwitcher}: ${localeNames[other]}`}>
+        <span aria-hidden="true" class="locale-switch__globe">
+          <svg viewBox="0 0 20 20" width="15" height="15" focusable="false">
+            <circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.5" />
+            <path d="M2.5 10h15M10 2.5c3 3 3 12 0 15M10 2.5c-3 3-3 12 0 15" fill="none" stroke="currentColor" stroke-width="1.2" />
+          </svg>
+        </span>
+        <span class="locale-switch__label">{localeNames[other]}</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector('[data-header]');
+  const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+  const nav = document.querySelector<HTMLElement>('[data-nav]');
+
+  toggle?.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!open));
+    nav?.classList.toggle('is-open', !open);
+    header?.classList.toggle('is-open', !open);
+  });
+
+  const onScroll = () => header?.classList.toggle('is-stuck', window.scrollY > 24);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: color-mix(in srgb, var(--ivory) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-block-end: 1px solid transparent;
+    transition: border-color var(--dur-mid) var(--ease-organic), background var(--dur-mid) var(--ease-organic);
+  }
+  .site-header.is-stuck { border-block-end-color: var(--line); }
+  .header__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+    min-block-size: var(--header-h);
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: var(--forest);
+    margin-inline-end: auto;
+  }
+  .brand__mark { color: var(--forest); display: grid; place-items: center; }
+  .brand__text { display: grid; line-height: 1.1; }
+  .brand__text strong { font-family: var(--font-display); font-size: 1.22rem; letter-spacing: -0.01em; }
+  .brand__text small { color: var(--muted); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; }
+
+  .nav__list {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.4rem, 1.4vw, 1.4rem);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nav__list a {
+    text-decoration: none;
+    color: var(--ink-soft);
+    font-weight: 500;
+    padding: 0.45rem 0.35rem;
+    border-radius: var(--radius-s);
+    transition: color var(--dur-fast) var(--ease-organic);
+    position: relative;
+  }
+  .nav__list a::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0.35rem;
+    inset-block-end: 0.15rem;
+    height: 2px;
+    background: var(--bronze);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-mid) var(--ease-organic);
+  }
+  .nav__list a:hover::after,
+  .nav__list a[aria-current='page']::after { transform: scaleX(1); }
+  .nav__list a[aria-current='page'] { color: var(--forest); font-weight: 600; }
+  .nav__search { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+  .header__aside { display: flex; align-items: center; gap: var(--space-2xs); }
+  .locale-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    padding: 0.34rem 0.78rem;
+    text-decoration: none;
+    color: var(--forest);
+    background: var(--ivory-warm);
+    transition: background var(--dur-fast) var(--ease-organic), transform var(--dur-fast) var(--ease-organic);
+  }
+  .locale-switch:hover { background: var(--sage-soft); transform: translateY(-1px); }
+  .locale-switch__label { font-weight: 600; font-size: var(--step--1); }
+
+  .nav-toggle { display: none; background: transparent; border: 1px solid var(--line-strong); border-radius: var(--radius-s); padding: 0.5rem; cursor: pointer; }
+  .nav-toggle__bars { display: grid; gap: 4px; }
+  .nav-toggle__bars i { display: block; width: 20px; height: 2px; background: var(--forest); }
+
+  @media (max-width: 60rem) {
+    .nav-toggle { display: block; }
+    .nav {
+      position: fixed;
+      inset: var(--header-h) 0 auto 0;
+      background: var(--ivory-warm);
+      border-block-end: 1px solid var(--line);
+      padding: var(--space-s) var(--gutter) var(--space-m);
+      display: none;
+    }
+    .nav.is-open { display: block; }
+    .nav__list { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
+    .nav__list a { display: block; padding: 0.6rem 0; font-size: var(--step-1); }
+    .brand__text small { display: none; }
+  }
+</style>

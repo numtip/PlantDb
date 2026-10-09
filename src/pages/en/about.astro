@@ -1,0 +1,12 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AboutView from '@/views/AboutView.astro';
+import { useTranslations } from '@/i18n/ui';
+
+const locale = 'en';
+const t = useTranslations(locale);
+---
+
+<BaseLayout locale={locale} title={t.seo.aboutTitle} description={t.seo.aboutDesc} path="about/">
+  <AboutView locale={locale} />
+</BaseLayout>

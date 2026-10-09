@@ -1,0 +1,42 @@
+---
+import { resolveLocalized } from '../i18n/localized-content';
+import { interpolate, useTranslations, type Locale } from '../i18n/ui';
+import { localePath } from '../i18n/urls';
+import { categoryPath, itemsInCategoryTree, type Category } from '../data/catalog';
+
+interface Props { category: Category; locale: Locale; }
+const { category, locale } = Astro.props;
+const t = useTranslations(locale);
+const name = resolveLocalized(category.name, locale);
+const count = itemsInCategoryTree(category.slug).length;
+// research has no category pages (the legacy collection had none either) — link to the index
+const seg = category.kind === 'plant' ? 'plants' : category.kind === 'animal' ? 'animals' : null;
+const href = seg ? localePath(locale, `${seg}/category/${category.slug}`) : localePath(locale, 'research');
+const trail = categoryPath(category.slug).slice(0, -1);
+---
+
+<a class="cat-card" href={href}>
+  <span class="cat-card__path">
+    {trail.length ? trail.join(' / ') : t.labels.catalogue}
+  </span>
+  <span class="cat-card__name">{name?.text ?? category.slug}</span>
+  <span class="cat-card__count">{interpolate(t.labels.itemCount, { count })}</span>
+</a>
+
+<style>
+  .cat-card {
+    display: grid;
+    gap: 0.2rem;
+    padding: var(--space-s) var(--space-m);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
+    background: var(--surface);
+    text-decoration: none;
+    transition: transform var(--dur-mid) var(--ease-organic), border-color var(--dur-mid) var(--ease-organic), background var(--dur-mid) var(--ease-organic);
+  }
+  .cat-card:hover { transform: translateY(-2px); border-color: var(--forest); background: var(--ivory-warm); }
+  .cat-card__path { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+  .cat-card__name { font-family: var(--font-display); font-size: var(--step-1); color: var(--forest); }
+  html[lang='th'] .cat-card__name { font-family: var(--font-thai-display); }
+  .cat-card__count { font-size: var(--step--1); color: var(--bronze-deep); }
+</style>

@@ -1,0 +1,28 @@
+---
+import { useTranslations, type Locale } from '../i18n/ui';
+import { localePath } from '../i18n/urls';
+import type { Crumb } from '../lib/types';
+
+interface Props { locale: Locale; trail: Crumb[]; }
+const { locale, trail } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<nav class="crumbs" aria-label={t.a11y.breadcrumbNav}>
+  <ol>
+    <li><a href={localePath(locale)}>{t.labels.breadcrumbHome}</a></li>
+    {trail.map((crumb) => (
+      <li>
+        {crumb.href ? <a href={crumb.href}>{crumb.label}</a> : <span aria-current="page">{crumb.label}</span>}
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<style>
+  .crumbs { font-size: var(--step--1); margin-block-end: var(--space-m); }
+  .crumbs ol { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; margin: 0; padding: 0; color: var(--muted); }
+  .crumbs li + li::before { content: '/'; margin-inline-end: 0.4rem; color: var(--line-strong); }
+  .crumbs a { color: var(--ink-soft); }
+  .crumbs [aria-current='page'] { color: var(--forest); font-weight: 600; }
+</style>

@@ -1,0 +1,27 @@
+{
+  "name": "plantdb",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PlantDb — Premium botanical collection for Maejo University (C5 bilingual TH/EN preview)",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "routes": "node scripts/gen-routes.mjs",
+    "test:i18n": "node --experimental-strip-types scripts/test-i18n.mjs",
+    "test:search": "node scripts/test-search.mjs",
+    "qa": "node scripts/qa-site.mjs",
+    "lighthouse": "node scripts/lighthouse.mjs",
+    "shots": "bash scripts/shots.sh"
+  },
+  "dependencies": {
+    "astro": "^5.0.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "lighthouse": "^13.5.0",
+    "typescript": "^5.9.3"
+  }
+}

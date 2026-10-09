@@ -1,0 +1,248 @@
+---
+/**
+ * Explorer — functional search + filter + sort, no framework, no animation library.
+ * The index is embedded once per page; filtering happens client-side because the
+ * catalogue is small (public demo set now, ~166 records after migration).
+ */
+import ItemCard from './ItemCard.astro';
+import States from './States.astro';
+import { useTranslations, type Locale } from '../i18n/ui';
+import { localePath } from '../i18n/urls';
+import { categories, publishedItems, type ItemKind } from '../data/catalog';
+import { resolveLocalized } from '../i18n/localized-content';
+
+interface Props {
+  locale: Locale;
+  /** restrict to one kind (catalogue pages) — omit for the global search page */
+  kind?: ItemKind;
+  initialCategory?: string;
+}
+const { locale, kind, initialCategory } = Astro.props;
+const t = useTranslations(locale);
+
+const scoped = kind ? publishedItems.filter((i) => i.kind === kind) : publishedItems;
+const kindCategories = categories.filter((c) => (kind ? c.kind === kind : true));
+
+const labels = {
+  placeholder: t.hero.searchPlaceholder,
+  searchLabel: t.hero.searchLabel,
+  results: t.labels.results,
+  all: t.labels.filterAll,
+  category: t.labels.filterCategory,
+  clear: t.labels.filterClear,
+  sort: t.labels.sort,
+  sortName: t.labels.sortName,
+  sortScientific: t.labels.sortScientific,
+  count: t.labels.resultCount,
+  emptyTitle: t.states.emptyTitle,
+  emptyBody: t.states.emptyBody,
+  hint: t.labels.emptySearchHint,
+  searchFor: t.labels.searchResultsFor,
+  kind: t.labels.filterType,
+  view: t.labels.viewDetail,
+  ariaSearch: t.a11y.searchForm,
+  ariaResults: t.a11y.resultsRegion,
+  ariaFilters: t.a11y.filtersRegion,
+  categories: kindCategories.map((c) => ({
+    slug: c.slug,
+    label: resolveLocalized(c.name, locale)?.text ?? c.slug,
+  })),
+};
+---
+
+<section class="explorer" data-explorer data-initial-category={initialCategory ?? ''}>
+  <form class="explorer__form" role="search" aria-label={labels.ariaSearch} data-explorer-form>
+    <label class="visually-hidden" for="q">{labels.searchLabel}</label>
+    <input
+      id="q"
+      name="q"
+      type="search"
+      class="explorer__input"
+      placeholder={labels.placeholder}
+      autocomplete="off"
+      data-explorer-input
+    />
+    <button class="btn btn--bronze" type="submit">{t.nav.search}</button>
+  </form>
+
+  <div class="explorer__filters" role="group" aria-label={labels.ariaFilters}>
+    <span class="explorer__filterlabel">{labels.category}</span>
+    <div class="explorer__chips" data-explorer-chips>
+      <button type="button" class="chip" data-cat="" aria-pressed="true">{labels.all}</button>
+      {labels.categories.map((c) => (
+        <button type="button" class="chip" data-cat={c.slug} aria-pressed={initialCategory === c.slug ? 'true' : 'false'}>
+          {c.label}
+        </button>
+      ))}
+    </div>
+    <label class="explorer__sort">
+      <span class="explorer__filterlabel">{labels.sort}</span>
+      <select class="explorer__select" data-explorer-sort>
+        <option value="name">{labels.sortName}</option>
+        <option value="scientific">{labels.sortScientific}</option>
+      </select>
+    </label>
+  </div>
+
+  <p class="explorer__count" data-explorer-count aria-live="polite"></p>
+
+  <div class="grid-auto" data-explorer-grid aria-label={labels.ariaResults}>
+    {scoped.map((item) => (
+      <div class="explorer__slot" data-slug={item.slug} data-name={resolveLocalized(item.name, locale)?.text ?? item.slug} data-scientific={item.scientificName} data-category={item.categorySlug} data-haystack={[
+        item.name.th?.value,
+        item.name.en?.value,
+        item.commonName.th?.value,
+        item.commonName.en?.value,
+        item.scientificName,
+        item.family,
+        item.tags.join(' '),
+      ]
+        .filter(Boolean)
+        .join(' ')}>
+        <ItemCard item={item} locale={locale} headingLevel={2} />
+      </div>
+    ))}
+  </div>
+
+  <div class="explorer__empty" data-explorer-empty hidden>
+    <States locale={locale} kind="empty" />
+  </div>
+</section>
+
+<script type="application/json" id="explorer-labels" set:html={JSON.stringify(labels)}></script>
+
+<script>
+  type Labels = {
+    count: string;
+    emptyTitle: string;
+    emptyBody: string;
+    hint: string;
+    searchFor: string;
+    all: string;
+    clear: string;
+    ariaSearch: string;
+  };
+
+  const root = document.querySelector<HTMLElement>('[data-explorer]');
+  if (root) {
+    const labels: Labels = JSON.parse(document.getElementById('explorer-labels')!.textContent || '{}');
+    const input = root.querySelector<HTMLInputElement>('[data-explorer-input]')!;
+    const sort = root.querySelector<HTMLSelectElement>('[data-explorer-sort]')!;
+    const chips = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-explorer-chips] .chip'));
+    const count = root.querySelector<HTMLElement>('[data-explorer-count]')!;
+    const grid = root.querySelector<HTMLElement>('[data-explorer-grid]')!;
+    const empty = root.querySelector<HTMLElement>('[data-explorer-empty]')!;
+    const slots = Array.from(root.querySelectorAll<HTMLElement>('.explorer__slot'));
+
+    const docs = slots.map((el) => ({
+      el,
+      slug: el.dataset.slug!,
+      name: el.dataset.name!.normalize('NFC').toLowerCase(),
+      scientific: (el.dataset.scientific || '').normalize('NFC').toLowerCase(),
+      // locale-independent search text: Thai name + English name + scientific name + common names + tags
+      haystack: (el.dataset.haystack || el.dataset.name || '').normalize('NFC').toLowerCase(),
+      category: el.dataset.category || '',
+    }));
+
+    const params = new URLSearchParams(location.search);
+    input.value = params.get('q') ?? '';
+    sort.value = params.get('sort') ?? 'name';
+
+    const activeCat = () => chips.find((c) => c.getAttribute('aria-pressed') === 'true')?.dataset.cat || '';
+    const initialCat = root.dataset.initialCategory || '';
+    if (initialCat) {
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.cat === initialCat)));
+    }
+
+    const norm = (s: string) => s.normalize('NFC').toLowerCase().trim();
+
+    function apply(pushState = true) {
+      const q = norm(input.value);
+      const cat = activeCat();
+      const terms = q.split(/\s+/).filter(Boolean);
+      const sortKey = sort.value;
+
+      let visible = 0;
+      const ordered = [...docs].sort((a, b) =>
+        sortKey === 'scientific' ? a.scientific.localeCompare(b.scientific, 'th') : a.name.localeCompare(b.name, 'th'));
+      ordered.forEach((doc) => {
+        const matchesText = terms.every((tm) => doc.haystack.includes(tm));
+        const matchesCat = !cat || doc.category === cat;
+        const show = matchesText && matchesCat;
+        doc.el.hidden = !show;
+        if (show) visible += 1;
+        grid.appendChild(doc.el);
+      });
+
+      count.textContent = labels.count.replace('{count}', String(visible));
+      empty.hidden = visible !== 0;
+
+      if (pushState) {
+        const next = new URLSearchParams();
+        if (input.value.trim()) next.set('q', input.value.trim());
+        if (cat) next.set('cat', cat);
+        if (sortKey !== 'name') next.set('sort', sortKey);
+        const qs = next.toString();
+        history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
+      }
+    }
+
+    chips.forEach((chip) =>
+      chip.addEventListener('click', () => {
+        chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+        apply();
+      }));
+    input.addEventListener('input', () => apply());
+    sort.addEventListener('change', () => apply());
+    root.querySelector<HTMLFormElement>('[data-explorer-form]')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      apply();
+      grid.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    });
+
+    apply(false);
+  }
+</script>
+
+<style>
+  .explorer__form {
+    display: flex;
+    gap: var(--space-2xs);
+    align-items: stretch;
+    flex-wrap: wrap;
+    margin-block-end: var(--space-m);
+  }
+  .explorer__input {
+    flex: 1 1 18rem;
+    font: inherit;
+    padding: 0.85rem 1.1rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .explorer__input:focus-visible { border-color: var(--forest); }
+  .explorer__filters {
+    display: flex;
+    gap: var(--space-2xs) var(--space-s);
+    align-items: center;
+    flex-wrap: wrap;
+    margin-block-end: var(--space-s);
+  }
+  .explorer__filterlabel { font-size: var(--step--1); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .explorer__chips { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .explorer__sort { display: flex; align-items: center; gap: 0.5rem; margin-inline-start: auto; }
+  .explorer__select {
+    font: inherit;
+    font-size: var(--step--1);
+    padding: 0.35rem 0.6rem;
+    border-radius: var(--radius-s);
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+  }
+  .explorer__count { color: var(--ink-soft); font-size: var(--step--1); margin-block-end: var(--space-s); }
+  .explorer__slot[hidden] { display: none; }
+  .explorer__slot { display: flex; flex-direction: column; }
+  .explorer__slot > :global(*) { flex: 1; }
+  .explorer__empty { margin-block-start: var(--space-m); }
+</style>

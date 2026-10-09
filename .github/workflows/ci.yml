@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate route tree
+        run: node scripts/gen-routes.mjs
+
+      - name: Type + template check
+        run: npx astro check
+
+      - name: TH/EN dictionary parity
+        run: node --experimental-strip-types scripts/test-i18n.mjs
+
+      - name: Build (static)
+        run: npm run build
+
+      - name: Functional QA (lang / canonical / hreflang / links / locale parity / sitemap)
+        run: node scripts/qa-site.mjs
+
+      - name: Install Chromium for the search test
+        run: npx playwright install --with-deps chromium
+
+      - name: Search functional test (both locales, real browser)
+        run: |
+          mkdir -p /tmp/c5-serve
+          ln -sfn "$PWD/dist" /tmp/c5-serve/PlantDb
+          python3 -m http.server 8099 --directory /tmp/c5-serve >/tmp/c5-serve.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -sf -o /dev/null http://127.0.0.1:8099/PlantDb/; then break; fi
+            sleep 1
+          done
+          if ! curl -sf -o /dev/null http://127.0.0.1:8099/PlantDb/; then
+            echo "static server failed to start"; cat /tmp/c5-serve.log; exit 1
+          fi
+          node scripts/test-search.mjs 8099
+
+      - name: Upload build + QA evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: plantdb-site-dist
+          path: |
+            dist
+            docs/evidence/qa-site.json
+          retention-days: 14
+
+  lighthouse:
+    runs-on: ubuntu-latest
+    needs: build-and-qa
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (static)
+        run: npm run build
+
+      - name: Install Chromium for Lighthouse
+        run: npx playwright install --with-deps chromium
+
+      - name: Point Lighthouse at the installed Chromium
+        run: |
+          CHROME=$(ls -d "$HOME"/.cache/ms-playwright/chromium-*/chrome-linux64/chrome | tail -1)
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+
+      - name: Lighthouse gate (TH/EN × desktop/mobile, all categories ≥ 90)
+        run: node scripts/lighthouse.mjs --urls=core --threshold=90
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: plantdb-lighthouse
+          path: |
+            docs/evidence/lighthouse
+            lighthouse-raw
+          retention-days: 14

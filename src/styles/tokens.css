@@ -1,0 +1,79 @@
+/* ==========================================================================
+   PlantDb design tokens — "Botanical Editorial × Modern Research Museum"
+   Owner-approved palette. No webfont downloads: system stacks only, so the
+   first paint never shifts (CLS = 0 by construction).
+   ========================================================================== */
+
+:root {
+  /* palette (owner-locked) */
+  --forest: #173d32;
+  --forest-deep: #0f2a22;
+  --ivory: #f6f3e9;
+  --ivory-warm: #fbf9f2;
+  --sage: #b9c99a;
+  --sage-soft: #d8e0c6;
+  --bronze: #c58d55;
+  --bronze-deep: #8f5f2e;  /* 4.92:1 on ivory (AA for small text) and as a button fill with ivory text */
+  --bronze-ink: #7d5023;   /* 5.4:1 on the bronze badge tint */
+
+  /* derived text + lines (contrast-checked against ivory) */
+  --ink: #1b2b24;          /* WCAG AA on ivory (13.6:1) */
+  --ink-soft: #43554b;     /* AA on ivory (6.6:1) */
+  --muted: #5f6f65;        /* 4.79:1 on ivory — AA for small text */
+  --line: rgba(23, 61, 50, 0.14);
+  --line-strong: rgba(23, 61, 50, 0.28);
+  --surface: #fffdf7;
+  --shadow-soft: 0 1px 2px rgba(15, 42, 34, 0.04), 0 8px 24px -12px rgba(15, 42, 34, 0.18);
+  --shadow-lift: 0 2px 4px rgba(15, 42, 34, 0.06), 0 24px 48px -20px rgba(15, 42, 34, 0.28);
+
+  /* type — editorial serif for display/Latin, Thai-first body stack */
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", "Noto Sans Thai", "Sarabun", "Leelawadee UI", Tahoma, sans-serif;
+  --font-thai-display: "Noto Serif Thai", "Sarabun", "Leelawadee UI", var(--font-display);
+
+  --step--1: clamp(0.82rem, 0.79rem + 0.14vw, 0.9rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.08rem);
+  --step-1: clamp(1.2rem, 1.12rem + 0.4vw, 1.4rem);
+  --step-2: clamp(1.5rem, 1.34rem + 0.8vw, 1.95rem);
+  --step-3: clamp(1.9rem, 1.6rem + 1.5vw, 2.7rem);
+  --step-4: clamp(2.4rem, 1.9rem + 2.6vw, 3.9rem);
+  --step-5: clamp(3rem, 2.1rem + 4.4vw, 5.6rem);
+  --leading-tight: 1.14;
+  --leading-body: 1.7;
+  --tracking-display: -0.015em;
+  --measure: 68ch;
+
+  /* space + shape */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-s: 1rem;
+  --space-m: 1.5rem;
+  --space-l: 2.5rem;
+  --space-xl: 4rem;
+  --space-2xl: 6.5rem;
+  --radius-s: 6px;
+  --radius-m: 14px;
+  --radius-l: 28px;
+  --radius-pill: 999px;
+
+  /* layout */
+  --shell: 1240px;
+  --gutter: clamp(1.15rem, 5vw, 3.25rem);
+  --grid-gap: clamp(1rem, 2.4vw, 2rem);
+  --header-h: 4.5rem;
+
+  /* motion (subtle; disabled wholesale under prefers-reduced-motion) */
+  --ease-organic: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-fast: 140ms;
+  --dur-mid: 280ms;
+  --dur-slow: 620ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 1ms;
+    --dur-mid: 1ms;
+    --dur-slow: 1ms;
+  }
+}

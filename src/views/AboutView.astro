@@ -1,0 +1,48 @@
+---
+import { useTranslations, type Locale } from '../i18n/ui';
+import { localePath } from '../i18n/urls';
+
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<section class="about-hero">
+  <div class="shell shell--wide">
+    <p class="eyebrow">{t.labels.catalogue}</p>
+    <h1>{t.labels.aboutProject}</h1>
+    <p class="lead">{t.about.lead}</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="shell shell--wide about-grid">
+    <article class="panel reveal">
+      <h2>{t.about.sectionProject}</h2>
+      <p>{t.about.bodyNote}</p>
+      <p>{t.footer.note}</p>
+    </article>
+    <article class="panel reveal" id="data">
+      <h2>{t.about.sectionData}</h2>
+      <p>{t.footer.provenance}</p>
+      <ul class="about-list">
+        <li>{t.labels.demoContent}</li>
+        <li>{t.labels.originalLanguage}</li>
+        <li>{t.about.bodyNote}</li>
+      </ul>
+    </article>
+    <article class="panel panel--accent reveal">
+      <h2>{t.about.sectionPublish}</h2>
+      <p>{t.hero.lead}</p>
+      <p><a class="btn btn--ghost" href={localePath(locale, 'search')}>{t.nav.search}</a></p>
+    </article>
+  </div>
+</section>
+
+<style>
+  .about-hero { padding-block: var(--space-xl) var(--space-l); border-block-end: 1px solid var(--line); background: linear-gradient(180deg, var(--ivory-warm), var(--ivory)); }
+  .about-hero h1 { max-width: 26ch; }
+  .about-grid { display: grid; gap: var(--grid-gap); grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); align-items: start; }
+  .panel--accent { background: linear-gradient(180deg, rgba(197, 141, 85, 0.14), var(--surface)); }
+  .about-list { margin: 0; padding-inline-start: 1.1rem; color: var(--ink-soft); }
+</style>

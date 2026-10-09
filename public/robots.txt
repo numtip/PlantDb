@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://numtip.github.io/PlantDb/sitemap.xml

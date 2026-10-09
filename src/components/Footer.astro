@@ -1,0 +1,77 @@
+---
+import { useTranslations, type Locale } from '../i18n/ui';
+import { localePath } from '../i18n/urls';
+
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const year = new Date().getFullYear();
+
+const explore = [
+  { href: localePath(locale, 'plants'), label: t.nav.plants },
+  { href: localePath(locale, 'animals'), label: t.nav.animals },
+  { href: localePath(locale, 'research'), label: t.nav.research },
+  { href: localePath(locale, 'search'), label: t.nav.search },
+];
+const about = [
+  { href: localePath(locale, 'about'), label: t.nav.about },
+  { href: localePath(locale, 'about') + '#data', label: t.about.sectionData },
+];
+---
+
+<footer class="site-footer">
+  <div class="shell shell--wide">
+    <div class="footer__grid">
+      <div>
+        <p class="eyebrow">{t.meta.siteShort}</p>
+        <h2 class="footer__title">{t.footer.title}</h2>
+        <p class="footer__note">{t.footer.note}</p>
+      </div>
+      <nav aria-label={t.footer.sectionExplore}>
+        <h3 class="footer__h">{t.footer.sectionExplore}</h3>
+        <ul class="footer__list">
+          {explore.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+        </ul>
+      </nav>
+      <nav aria-label={t.footer.sectionAbout}>
+        <h3 class="footer__h">{t.footer.sectionAbout}</h3>
+        <ul class="footer__list">
+          {about.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+        </ul>
+      </nav>
+      <div>
+        <h3 class="footer__h">{t.footer.sectionLegal}</h3>
+        <p class="footer__note">{t.footer.provenance}</p>
+      </div>
+    </div>
+    <hr class="rule" />
+    <div class="footer__base">
+      <p>© {year} {t.footer.rights}</p>
+      <p class="footer__locale" lang={locale}>{t.meta.siteName}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--forest);
+    color: var(--ivory);
+    margin-block-start: var(--space-2xl);
+    padding-block: var(--space-xl) var(--space-l);
+  }
+  .site-footer :is(a, h2, h3) { color: var(--ivory); }
+  .site-footer a { text-decoration-color: rgba(246, 243, 233, 0.4); }
+  .site-footer a:hover { color: var(--sage); }
+  .site-footer .rule { border-color: rgba(246, 243, 233, 0.18); }
+  .footer__grid {
+    display: grid;
+    gap: var(--space-l);
+    grid-template-columns: minmax(0, 1.4fr) repeat(auto-fit, minmax(10rem, 1fr));
+  }
+  .footer__title { font-size: var(--step-2); margin-block-end: var(--space-2xs); }
+  .footer__h { font-size: var(--step--1); letter-spacing: 0.12em; text-transform: uppercase; color: var(--sage) !important; font-family: var(--font-body); font-weight: 600; }
+  .footer__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.45rem; }
+  .footer__note { color: rgba(246, 243, 233, 0.78); font-size: var(--step--1); max-width: 42ch; }
+  .footer__base { display: flex; flex-wrap: wrap; gap: var(--space-s); justify-content: space-between; color: rgba(246, 243, 233, 0.7); font-size: var(--step--1); }
+  .footer__base p { margin: 0; }
+</style>

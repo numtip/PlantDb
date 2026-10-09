@@ -1,0 +1,56 @@
+{
+  "id": "th-catalogue-desktop",
+  "url": "http://127.0.0.1:8098/PlantDb/plants/",
+  "formFactor": "desktop",
+  "fetchedAt": "2026-10-09T01:43:08.093Z",
+  "lighthouseVersion": "13.5.0",
+  "threshold": 90,
+  "scores": {
+    "performance": 100,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100
+  },
+  "passed": true,
+  "categoriesBelowThreshold": [],
+  "metrics": {
+    "first-contentful-paint": "0.4 s",
+    "largest-contentful-paint": "0.4 s",
+    "total-blocking-time": "0 ms",
+    "cumulative-layout-shift": "0.01",
+    "speed-index": "0.5 s",
+    "interactive": "0.4 s"
+  },
+  "failingAudits": [
+    {
+      "id": "max-potential-fid",
+      "title": "Max Potential First Input Delay",
+      "score": 0.95,
+      "displayValue": "110 ms"
+    },
+    {
+      "id": "cache-insight",
+      "title": "Use efficient cache lifetimes",
+      "score": 0.5,
+      "displayValue": "Est savings of 13 KiB"
+    },
+    {
+      "id": "document-latency-insight",
+      "title": "Document request latency",
+      "score": 0.5,
+      "displayValue": "Est savings of 32 KiB"
+    },
+    {
+      "id": "network-dependency-tree-insight",
+      "title": "Network dependency tree",
+      "score": 0,
+      "displayValue": null
+    },
+    {
+      "id": "render-blocking-insight",
+      "title": "Render-blocking requests",
+      "score": 0.5,
+      "displayValue": null
+    }
+  ]
+}

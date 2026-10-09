@@ -1,0 +1,69 @@
+{
+  "generatedAt": "2026-10-09T01:42:27.477Z",
+  "site": {
+    "site": "https://numtip.github.io",
+    "base": "/PlantDb",
+    "pages": 62,
+    "locales": [
+      "th",
+      "en"
+    ]
+  },
+  "assertions": 9,
+  "counters": {
+    "linksChecked": 2274,
+    "assetsChecked": 188,
+    "hreflangChecked": 180,
+    "canonicalChecked": 60
+  },
+  "passed": 9,
+  "failed": 0,
+  "problems": [],
+  "checks": [
+    {
+      "name": "fallback-directions",
+      "status": "PASS",
+      "detail": "th-only record falls back on EN (1 page), en-only record falls back on TH (1 page)"
+    },
+    {
+      "name": "route-parity",
+      "status": "PASS",
+      "detail": "30 routes exist in both locales"
+    },
+    {
+      "name": "no-third-party-urls",
+      "status": "PASS",
+      "detail": "every absolute URL points at the project site (XML namespaces excluded)"
+    },
+    {
+      "name": "demo-provenance",
+      "status": "PASS",
+      "detail": "26 detail pages show demo provenance (no unlabelled content)"
+    },
+    {
+      "name": "no-migrated-records",
+      "status": "PASS",
+      "detail": "no migrated/legacy records or production identifiers in the build"
+    },
+    {
+      "name": "explorer",
+      "status": "PASS",
+      "detail": "30 catalogue/search pages expose the search+filter explorer"
+    },
+    {
+      "name": "explorer-labels",
+      "status": "PASS",
+      "detail": "30 pages embed a localized label payload"
+    },
+    {
+      "name": "sitemap",
+      "status": "PASS",
+      "detail": "30 URLs, all resolvable, all with th/en/x-default alternates"
+    },
+    {
+      "name": "sitemap-coverage",
+      "status": "PASS",
+      "detail": "30 sitemap URLs ≥ 30 pages"
+    }
+  ]
+}

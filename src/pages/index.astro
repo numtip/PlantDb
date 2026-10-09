@@ -1,0 +1,12 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import HomeView from '@/views/HomeView.astro';
+import { useTranslations } from '@/i18n/ui';
+
+const locale = 'th';
+const t = useTranslations(locale);
+---
+
+<BaseLayout locale={locale} title={t.seo.homeTitle} description={t.seo.homeDesc} path="">
+  <HomeView locale={locale} />
+</BaseLayout>

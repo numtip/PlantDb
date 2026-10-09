@@ -1,0 +1,173 @@
+---
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import type { Crumb } from '../lib/types';
+import BotanicalPlate from '../components/BotanicalPlate.astro';
+import ItemCard from '../components/ItemCard.astro';
+import { useTranslations, type Locale } from '../i18n/ui';
+import { localePath } from '../i18n/urls';
+import { resolveLocalized } from '../i18n/localized-content';
+import { categories, categoryPath, relatedItems, type DemoItem } from '../data/catalog';
+
+interface Props { locale: Locale; item: DemoItem; }
+const { locale, item } = Astro.props;
+const t = useTranslations(locale);
+
+const name = resolveLocalized(item.name, locale);
+const common = resolveLocalized(item.commonName, locale);
+const summary = resolveLocalized(item.summary, locale);
+const characteristics = resolveLocalized(item.characteristics, locale);
+const origin = resolveLocalized(item.origin, locale);
+const agency = resolveLocalized(item.agency, locale);
+const people = resolveLocalized(item.people, locale);
+const notes = resolveLocalized(item.notes, locale);
+
+const basePath = item.kind === 'plant' ? 'plants' : item.kind === 'animal' ? 'animals' : 'research';
+// research has no category routes, so its breadcrumb labels are not links
+const catPath = categoryPath(item.categorySlug);
+const trail: Crumb[] = catPath.map((slug) => {
+  const node = categories.find((c) => c.slug === slug)!;
+  return item.kind === 'research'
+    ? { label: resolveLocalized(node.name, locale)?.text ?? slug }
+    : { label: resolveLocalized(node.name, locale)?.text ?? slug, href: localePath(locale, `${basePath}/category/${slug}`) };
+});
+trail.push({ label: name?.text ?? item.slug });
+
+const related = relatedItems(item);
+const unreviewed = name?.isUnreviewed ?? false;
+const isFallback = name?.isFallback ?? false;
+
+const rows: Array<{ label: string; value: string | undefined }> = [
+  { label: t.detail.thaiName, value: item.name.th?.value },
+  { label: t.detail.scientificName, value: item.scientificName !== '—' ? item.scientificName : undefined },
+  { label: t.detail.commonName, value: common?.text },
+  { label: t.detail.family, value: item.family !== '—' ? item.family : undefined },
+  { label: t.detail.agency, value: agency?.text },
+  { label: t.detail.collector, value: people?.text },
+];
+const visibleRows = rows.filter((r) => r.value);
+---
+
+<article class="detail">
+  <div class="shell shell--wide">
+    <Breadcrumbs locale={locale} trail={trail} />
+  </div>
+
+  <!-- immersive header -->
+  <header class="detail__hero">
+    <div class="shell shell--wide detail__hero-grid">
+      <div class="detail__intro">
+        <p class="eyebrow">{t.labels.catalogue} · {item.kind === 'plant' ? t.collections.plants.title : item.kind === 'animal' ? t.collections.animals.title : t.collections.research.title}</p>
+        <h1>{name?.text ?? item.slug}</h1>
+        <p class="scientific detail__sci" lang="la">{item.scientificName !== '—' ? item.scientificName : ''}</p>
+        {summary ? <p class="lead">{summary.text}</p> : null}
+        <p class="detail__badges">
+          {unreviewed ? <span class="badge">{t.labels.demoContent}</span> : null}
+          {isFallback ? <span class="badge">⚠︎ {t.labels.originalLanguage}</span> : null}
+          <span class="chip">{item.kind === 'plant' ? t.collections.plants.title : item.kind === 'animal' ? t.collections.animals.title : t.collections.research.title}</span>
+        </p>
+      </div>
+      <div class="detail__plate">
+        <BotanicalPlate seed={item.slug} variant="tall" label={t.a11y.imageOf.replace('{name}', name?.text ?? item.slug)} />
+        <p class="detail__media-note">{t.labels.noImage}</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="shell shell--wide detail__body">
+    <div class="detail__main">
+      {/* taxonomy card */}
+      <section class="panel reveal" aria-labelledby="tax">
+        <h2 id="tax">{t.detail.taxonomy}</h2>
+        <dl class="kv">
+          {visibleRows.map((r) => (
+            <div class="kv__row">
+              <dt>{r.label}</dt>
+              <dd class={r.label === t.detail.scientificName ? 'scientific' : ''}>{r.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      {characteristics?.text && characteristics.text !== '—' ? (
+        <section class="panel reveal" aria-labelledby="chars">
+          <h2 id="chars">{t.detail.characteristics}</h2>
+          <p>{characteristics.text}</p>
+        </section>
+      ) : null}
+
+      {origin?.text ? (
+        <section class="panel reveal" aria-labelledby="origin">
+          <h2 id="origin">{t.detail.origin}</h2>
+          <p>{origin.text}</p>
+        </section>
+      ) : null}
+
+      {notes?.text && notes.text !== '—' ? (
+        <section class="panel panel--note reveal" aria-labelledby="notes">
+          <h2 id="notes">{t.detail.notes}</h2>
+          <p>{notes.text}</p>
+        </section>
+      ) : null}
+    </div>
+
+    <aside class="detail__aside">
+      <section class="panel panel--meta reveal" aria-labelledby="prov">
+        <h2 id="prov">{t.labels.provenance}</h2>
+        <dl class="kv kv--tight">
+          <div class="kv__row"><dt>ID</dt><dd>{item.legacyId}</dd></div>
+          <div class="kv__row"><dt>{t.labels.publishedState}</dt><dd>{item.publication.state === 'published' ? t.labels.published : t.labels.unpublished}</dd></div>
+          <div class="kv__row"><dt>{t.labels.category}</dt><dd>{trail[trail.length - 2]?.label ?? '—'}</dd></div>
+          <div class="kv__row"><dt>{t.detail.sourceData}</dt><dd>{item.provenance.source}</dd></div>
+        </dl>
+        <p class="notice">{t.labels.demoContent} — {t.about.bodyNote}</p>
+      </section>
+
+      {item.tags.length ? (
+        <section class="panel reveal">
+          <h2>{t.labels.tags}</h2>
+          <p class="detail__tags">{item.tags.map((tag) => <span class="chip">{tag.trim()}</span>)}</p>
+        </section>
+      ) : null}
+    </aside>
+  </div>
+
+  {related.length ? (
+    <section class="section section--tint">
+      <div class="shell shell--wide">
+        <h2 class="reveal">{t.labels.relatedItems}</h2>
+        <div class="grid-auto">
+          {related.map((r) => <ItemCard item={r} locale={locale} />)}
+        </div>
+      </div>
+    </section>
+  ) : null}
+</article>
+
+<style>
+  .detail__hero { padding-block: var(--space-s) var(--space-l); }
+  .detail__hero-grid { display: grid; gap: var(--space-l); }
+  @media (min-width: 62rem) {
+    .detail__hero-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: center; }
+  }
+  .detail__sci { font-size: var(--step-1); margin-block-end: var(--space-xs); }
+  .detail__badges { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-block-start: var(--space-s); }
+  .detail__plate { position: relative; border-radius: var(--radius-l); overflow: hidden; border: 1px solid var(--line); }
+  .detail__media-note { margin: 0; padding: 0.6rem var(--space-s); font-size: var(--step--1); color: var(--muted); background: var(--ivory-warm); }
+  .detail__body { display: grid; gap: var(--grid-gap); padding-block: var(--space-l); }
+  @media (min-width: 62rem) {
+    .detail__body { grid-template-columns: minmax(0, 1.6fr) minmax(0, 0.9fr); align-items: start; }
+  }
+  .detail__main { display: grid; gap: var(--grid-gap); }
+  .detail__aside { display: grid; gap: var(--grid-gap); }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-l); padding: clamp(1.15rem, 3vw, var(--space-l)); }
+  .panel h2 { font-size: var(--step-2); }
+  .panel--note { background: linear-gradient(180deg, rgba(185, 201, 154, 0.22), var(--surface)); }
+  .panel--meta { background: var(--ivory-warm); }
+  .kv { display: grid; gap: 0.55rem; margin: 0; }
+  .kv__row { display: grid; gap: 0.15rem; padding-block-end: 0.5rem; border-block-end: 1px dashed var(--line); }
+  .kv__row:last-child { border-block-end: 0; }
+  .kv dt { font-size: var(--step--1); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .kv dd { margin: 0; }
+  .kv--tight .kv__row { padding-block-end: 0.3rem; }
+  .detail__tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+</style>

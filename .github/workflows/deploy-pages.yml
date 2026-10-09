@@ -1,0 +1,51 @@
+name: Deploy to GitHub Pages (GATED — not active)
+
+# ⚠️ DO NOT ENABLE YET.
+# The owner has not approved publication ("no PR merge or Pages activation without owner
+# approval"). This workflow only runs when:
+#   1. Settings → Pages → Source = "GitHub Actions" is enabled by the owner, AND
+#   2. someone pushes to `main` or starts it manually.
+# Until then it is inert: pushes to feature branches never trigger it.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node scripts/gen-routes.mjs
+      - run: npx astro check
+      - run: npm run build
+      - run: node scripts/qa-site.mjs
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

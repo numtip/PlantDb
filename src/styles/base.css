@@ -1,0 +1,262 @@
+/* Base + layout + primitives. Kept deliberately small: tokens do the heavy lifting. */
+@import './tokens.css';
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+body {
+  margin: 0;
+  background: var(--ivory);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img, svg, video { max-width: 100%; height: auto; display: block; }
+
+a { color: var(--forest); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+a:hover { color: var(--bronze-deep); }
+
+:is(a, button, input, select, [tabindex]):focus-visible {
+  outline: 3px solid var(--bronze);
+  outline-offset: 2px;
+  border-radius: var(--radius-s);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-display);
+  color: var(--forest);
+  margin: 0 0 var(--space-xs);
+  text-wrap: balance;
+}
+h1 { font-size: var(--step-4); }
+h2 { font-size: var(--step-3); }
+h3 { font-size: var(--step-2); }
+h4 { font-size: var(--step-1); }
+html[lang='th'] :is(h1, h2, h3, h4) { font-family: var(--font-thai-display); letter-spacing: 0; }
+
+p { margin: 0 0 var(--space-s); max-width: var(--measure); }
+p.lead { font-size: var(--step-1); color: var(--ink-soft); }
+
+.scientific {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--ink-soft);
+}
+html[lang='th'] .scientific { font-family: var(--font-display); }
+
+/* ---------- layout primitives ---------- */
+.shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.shell--wide { max-width: 1480px; }
+
+.section { padding-block: clamp(3rem, 7vw, var(--space-2xl)); }
+.section--tight { padding-block: clamp(2rem, 4vw, var(--space-xl)); }
+.section--tint { background: var(--ivory-warm); }
+.section--forest { background: var(--forest); color: var(--ivory); }
+.section--forest :is(h1, h2, h3, h4) { color: var(--ivory); }
+.section--forest a { color: var(--sage-soft); }
+
+.split {
+  display: grid;
+  gap: var(--grid-gap);
+  align-items: center;
+}
+@media (min-width: 62rem) {
+  .split { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); }
+  .split--flip > :first-child { order: 2; }
+}
+
+/* asymmetry: editorial offset that stays usable on small screens */
+.editorial-offset { margin-block-start: 0; }
+@media (min-width: 62rem) {
+  .editorial-offset { margin-block-start: var(--space-xl); }
+}
+
+.grid-auto {
+  display: grid;
+  gap: var(--grid-gap);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+}
+
+/* ---------- eyebrow / meta ---------- */
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bronze-deep);
+  margin: 0 0 var(--space-2xs);
+  font-weight: 600;
+}
+.section--forest .eyebrow { color: var(--sage); }
+
+.rule {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin-block: var(--space-m);
+}
+
+/* ---------- buttons ---------- */
+.btn {
+  --btn-bg: var(--forest);
+  --btn-fg: var(--ivory);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  padding: 0.7rem 1.35rem;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-organic), background var(--dur-fast) var(--ease-organic), box-shadow var(--dur-fast) var(--ease-organic);
+}
+.btn:hover { background: var(--forest-deep); color: var(--ivory); transform: translateY(-1px); box-shadow: var(--shadow-soft); }
+.btn--bronze { --btn-bg: var(--bronze-deep); }
+.btn--bronze:hover { --btn-bg: #7d5227; }
+.btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--forest);
+  border-color: var(--line-strong);
+}
+.btn--ghost:hover { --btn-bg: rgba(23, 61, 50, 0.06); --btn-fg: var(--forest); }
+
+/* ---------- cards ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-l);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--dur-mid) var(--ease-organic), box-shadow var(--dur-mid) var(--ease-organic), border-color var(--dur-mid) var(--ease-organic);
+}
+.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); border-color: var(--line-strong); }
+.card__body { padding: var(--space-m); display: flex; flex-direction: column; gap: var(--space-2xs); flex: 1; }
+.card__title { margin: 0; font-size: var(--step-1); }
+.card__meta { color: var(--muted); font-size: var(--step--1); margin: 0; }
+
+/* image plate: organic corner + no layout shift (aspect box) */
+.plate {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(155deg, var(--sage-soft), rgba(185, 201, 154, 0.35) 55%, rgba(197, 141, 85, 0.18));
+  overflow: hidden;
+}
+.plate img { width: 100%; height: 100%; object-fit: cover; }
+.plate--tall { aspect-ratio: 3 / 4; }
+.plate--wide { aspect-ratio: 16 / 9; }
+.plate__placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  padding: var(--space-m);
+  color: var(--forest);
+  font-size: var(--step--1);
+  letter-spacing: 0.04em;
+}
+
+/* ---------- chips / badges ---------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  padding: 0.25rem 0.72rem;
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+  background: var(--ivory-warm);
+  text-decoration: none;
+}
+a.chip:hover { background: var(--sage-soft); color: var(--forest); border-color: var(--forest); }
+.chip[aria-pressed='true'] { background: var(--forest); color: var(--ivory); border-color: var(--forest); }
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--step--1);
+  border-radius: var(--radius-s);
+  padding: 0.2rem 0.5rem;
+  background: rgba(197, 141, 85, 0.16);
+  /* darker than --bronze-deep: the badge sits on a bronze tint, not on plain ivory */
+  color: var(--bronze-ink);
+  border: 1px dashed rgba(156, 106, 55, 0.5);
+}
+
+/* ---------- provenance / demo notice ---------- */
+.notice {
+  display: flex;
+  gap: var(--space-2xs);
+  align-items: flex-start;
+  border-left: 3px solid var(--bronze);
+  background: rgba(197, 141, 85, 0.09);
+  padding: var(--space-xs) var(--space-s);
+  border-radius: 0 var(--radius-m) var(--radius-m) 0;
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+
+/* ---------- states ---------- */
+.state {
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-l);
+  padding: clamp(1.5rem, 4vw, var(--space-xl));
+  text-align: center;
+  background: var(--ivory-warm);
+}
+.state h2 { font-size: var(--step-2); }
+.state p { margin-inline: auto; }
+
+.skeleton { background: linear-gradient(90deg, rgba(23,61,50,.06), rgba(23,61,50,.12), rgba(23,61,50,.06)); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; border-radius: var(--radius-m); }
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* ---------- scroll reveal (JS adds .is-in; CSS-only fallback keeps content visible) ---------- */
+.reveal { opacity: 1; }
+html.js .reveal { opacity: 0; transform: translateY(14px); }
+html.js .reveal.is-in { opacity: 1; transform: none; transition: opacity var(--dur-slow) var(--ease-organic), transform var(--dur-slow) var(--ease-organic); }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.skip-link {
+  position: absolute; inset-inline-start: var(--space-s); inset-block-start: -3rem;
+  background: var(--forest); color: var(--ivory); padding: 0.6rem 1rem;
+  border-radius: var(--radius-pill); z-index: 40; text-decoration: none;
+}
+.skip-link:focus { inset-block-start: var(--space-s); }
+
+/* Thai has no word spaces: discourage mid-word breaks in display headings and balance lines */
+h1, h2, h3 { word-break: keep-all; text-wrap: balance; }
+html[lang='th'] h1, html[lang='th'] h2, html[lang='th'] h3 { line-height: 1.35; }
+html[lang='th'] .hero__title { max-width: 30ch; }
+
+/* on the dark forest bands, bronze is unreadable — eyebrows use sage instead (6.8:1) */
+.site-footer .eyebrow { color: var(--sage); }
