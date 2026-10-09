@@ -58,6 +58,12 @@ gate on this commit reproduces the same output; the only variation observed betw
 Lighthouse's own timing noise (a re-run by the independent reviewer scored one mobile run at 98
 for performance, still far above the threshold).
 
+Gate robustness (added after observing a stale server in practice): the script refuses to run if
+anything is already serving on its port (a leftover server from an earlier run served a deleted
+directory and produced a 404 instead of a measurement), and writes one summary per URL set
+(`summary-core.json`, and `summary.json` only for the full set) so a quick check run cannot
+overwrite the committed full-set evidence.
+
 Method: `node scripts/lighthouse.mjs --urls=full --threshold=90`. The script serves `dist/` under
 the real Pages base path (`/PlantDb/`) so the measured page is the shipped page, runs Lighthouse
 13.5 in headless Chromium, writes a trimmed report per run plus `summary.json` (committed) and the

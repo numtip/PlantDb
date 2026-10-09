@@ -60,6 +60,24 @@ if (!chrome) {
   process.exit(2);
 }
 
+// ---- refuse to run if something is already listening: a stale server from an earlier run
+//      would otherwise be measured (it can serve a deleted/rebuilt directory and 404). ----
+const portBusy = (() => {
+  try {
+    execFileSync('curl', ['-sf', '-o', '/dev/null', '--max-time', '2', `http://127.0.0.1:${PORT}/PlantDb/`], { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+})();
+if (portBusy) {
+  console.error(
+    `port ${PORT} is already serving something — refusing to measure an unknown server.\n` +
+      `Stop it (or pass --port=<free port>) and run again.`,
+  );
+  process.exit(2);
+}
+
 // ---- serve dist/ at /PlantDb/ (same shape as GitHub Pages) ----
 const serveDir = `/tmp/c5-lh-serve`;
 rmSync(serveDir, { recursive: true, force: true });
@@ -165,7 +183,10 @@ const summary = {
   allPassed: results.every((r) => r.passed),
   table: results.map((r) => ({ id: r.id, form: r.formFactor, ...r.scores, passed: r.passed })),
 };
-writeFileSync(join(outDir, 'summary.json'), JSON.stringify(summary, null, 2));
+// one file per set (a `--urls=core` check run must not clobber the committed full-set evidence),
+// plus the canonical summary.json that the full gate produces
+writeFileSync(join(outDir, `summary-${SET}.json`), JSON.stringify(summary, null, 2));
+if (SET === 'full') writeFileSync(join(outDir, 'summary.json'), JSON.stringify(summary, null, 2));
 
 console.log('\n| run | form | perf | a11y | best-practices | seo | pass |');
 console.log('| --- | --- | --- | --- | --- | --- | --- |');
