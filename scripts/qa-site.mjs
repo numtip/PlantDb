@@ -147,9 +147,13 @@ for (const file of htmlFiles) {
   if (locale === 'th' && !hasThai) bad('thai-copy', `${rel(file)} has no Thai characters`);
   page.hasThai = hasThai;
 
-  // 10. exactly one h1 per page (document outline / a11y)
+  // 10. exactly one h1 per page (document outline / a11y) and no skipped heading levels
   const h1s = html.match(/<h1[\s>]/g) ?? [];
   if (h1s.length !== 1) bad('h1-count', `${rel(file)} has ${h1s.length} <h1> elements (expected exactly 1)`);
+  const levels = [...html.matchAll(/<h([1-6])[\s>]/g)].map((m) => Number(m[1]));
+  const jump = levels.findIndex((lvl, i) => i > 0 && lvl > levels[i - 1] + 1);
+  if (levels[0] !== 1) bad('heading-order', `${rel(file)} first heading is h${levels[0]}`);
+  else if (jump > 0) bad('heading-order', `${rel(file)} jumps h${levels[jump - 1]} → h${levels[jump]}`);
 
   // 11. untranslated records must be shown with the source-language badge, never hidden
   //     (a badge is only expected on the locale that lacks the text)
@@ -184,6 +188,41 @@ const onlyTh = [...thRoutes].filter((r) => !enRoutes.has(r));
 const onlyEn = [...enRoutes].filter((r) => !thRoutes.has(r));
 if (onlyTh.length === 0 && onlyEn.length === 0) ok('route-parity', `${thRoutes.size} routes exist in both locales`);
 else bad('route-parity', `TH-only: ${onlyTh.join(', ') || '—'} | EN-only: ${onlyEn.join(', ') || '—'}`);
+
+// ---------- 6b. no third-party URLs (privacy + no external link rot) ----------
+{
+  const hosts = new Map();
+  for (const file of htmlFiles) {
+    const html = readFileSync(file, 'utf8');
+    for (const m of html.matchAll(/https?:\/\/[a-zA-Z0-9.-]+/g)) {
+      const url = m[0];
+      if (url.startsWith(SITE)) continue; // own absolute URLs (canonical, hreflang, og)
+      hosts.set(url, (hosts.get(url) ?? 0) + 1);
+    }
+  }
+  const foreign = [...hosts.entries()].filter(([u]) => !u.startsWith('http://www.w3.org') && !u.startsWith('http://www.sitemaps.org'));
+  if (foreign.length === 0) ok('no-third-party-urls', 'every absolute URL points at the project site (XML namespaces excluded)');
+  else bad('no-third-party-urls', `third-party host(s) present: ${foreign.map(([u, n]) => `${u}×${n}`).join(', ')}`);
+}
+
+// ---------- 6c. data safety: the preview contains demo fixtures only ----------
+{
+  const detail = pages.filter((p) => /\/(plants|animals|research)\/[^/]+\/$/.test(p.url) && !p.url.includes('/category/'));
+  const badProvenance = [];
+  const legacyLeak = [];
+  for (const p of detail) {
+    const html = readFileSync(join(dist, p.file.slice(1)), 'utf8');
+    if (!/demo-fixture|demo:item:/.test(html)) badProvenance.push(p.url);
+    if (/legacy:item:|10\.1\.254|centos226/.test(html)) legacyLeak.push(p.url);
+  }
+  if (badProvenance.length === 0 && detail.length > 0) {
+    ok('demo-provenance', `${detail.length} detail pages show demo provenance (no unlabelled content)`);
+  } else {
+    bad('demo-provenance', `missing demo provenance on: ${badProvenance.join(', ') || '(no detail pages found)'}`);
+  }
+  if (legacyLeak.length === 0) ok('no-migrated-records', 'no migrated/legacy records or production identifiers in the build');
+  else bad('no-migrated-records', `production-derived content present on: ${legacyLeak.join(', ')}`);
+}
 
 // ---------- 7. explorer presence ----------
 const cataloguePages = pages.filter((p) => /^\/(en\/)?(plants|animals|research|search)\/$/.test(p.url.replace(/^\/PlantDb/, '')) || p.url.includes('/category/'));

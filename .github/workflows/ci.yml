@@ -62,3 +62,41 @@ jobs:
             dist
             docs/evidence/qa-site.json
           retention-days: 14
+
+  lighthouse:
+    runs-on: ubuntu-latest
+    needs: build-and-qa
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (static)
+        run: npm run build
+
+      - name: Install Chromium for Lighthouse
+        run: npx playwright install --with-deps chromium
+
+      - name: Point Lighthouse at the installed Chromium
+        run: |
+          CHROME=$(ls -d "$HOME"/.cache/ms-playwright/chromium-*/chrome-linux64/chrome | tail -1)
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+
+      - name: Lighthouse gate (TH/EN × desktop/mobile, all categories ≥ 90)
+        run: node scripts/lighthouse.mjs --urls=core --threshold=90
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: plantdb-lighthouse
+          path: |
+            docs/evidence/lighthouse
+            lighthouse-raw
+          retention-days: 14

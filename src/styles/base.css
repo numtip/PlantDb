@@ -204,7 +204,8 @@ a.chip:hover { background: var(--sage-soft); color: var(--forest); border-color:
   border-radius: var(--radius-s);
   padding: 0.2rem 0.5rem;
   background: rgba(197, 141, 85, 0.16);
-  color: var(--bronze-deep);
+  /* darker than --bronze-deep: the badge sits on a bronze tint, not on plain ivory */
+  color: var(--bronze-ink);
   border: 1px dashed rgba(156, 106, 55, 0.5);
 }
 
@@ -256,3 +257,6 @@ html.js .reveal.is-in { opacity: 1; transform: none; transition: opacity var(--d
 h1, h2, h3 { word-break: keep-all; text-wrap: balance; }
 html[lang='th'] h1, html[lang='th'] h2, html[lang='th'] h3 { line-height: 1.35; }
 html[lang='th'] .hero__title { max-width: 30ch; }
+
+/* on the dark forest bands, bronze is unreadable — eyebrows use sage instead (6.8:1) */
+.site-footer .eyebrow { color: var(--sage); }

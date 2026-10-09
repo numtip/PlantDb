@@ -5,8 +5,15 @@ import { useTranslations, type Locale } from '../i18n/ui';
 import { localePath } from '../i18n/urls';
 import type { DemoItem } from '../data/catalog';
 
-interface Props { item: DemoItem; locale: Locale; categoryLabel?: string; }
-const { item, locale, categoryLabel } = Astro.props;
+interface Props {
+  item: DemoItem;
+  locale: Locale;
+  categoryLabel?: string;
+  /** heading level: h3 under a section heading (home), h2 in catalogue/search grids */
+  headingLevel?: 2 | 3;
+}
+const { item, locale, categoryLabel, headingLevel = 3 } = Astro.props;
+const Heading = `h${headingLevel}` as 'h2' | 'h3';
 const t = useTranslations(locale);
 
 const name = resolveLocalized(item.name, locale);
@@ -26,7 +33,7 @@ const altText = t.a11y.imageOf.replace('{name}', name?.text ?? item.slug);
       {categoryLabel ? <span class="item-card__cat">{categoryLabel}</span> : null}
       {unreviewed ? <span class="badge">{t.labels.demoContent}</span> : null}
     </p>
-    <h3 class="card__title"><a href={href}>{name?.text ?? item.slug}</a></h3>
+    <Heading class="card__title"><a href={href}>{name?.text ?? item.slug}</a></Heading>
     {fallback ? <p class="item-card__fallback">⚠︎ {t.labels.originalLanguage}</p> : null}
     <p class="scientific" lang="la">{item.scientificName}</p>
     {common && common.text !== name?.text ? <p class="card__meta">{common.text}</p> : null}

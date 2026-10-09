@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-08T20:43:58.059Z",
+  "generatedAt": "2026-10-09T01:36:19.369Z",
   "site": {
     "site": "https://numtip.github.io",
     "base": "/PlantDb",
@@ -9,14 +9,14 @@
       "en"
     ]
   },
-  "assertions": 6,
+  "assertions": 9,
   "counters": {
     "linksChecked": 2274,
     "assetsChecked": 188,
     "hreflangChecked": 180,
     "canonicalChecked": 60
   },
-  "passed": 6,
+  "passed": 9,
   "failed": 0,
   "problems": [],
   "checks": [
@@ -29,6 +29,21 @@
       "name": "route-parity",
       "status": "PASS",
       "detail": "30 routes exist in both locales"
+    },
+    {
+      "name": "no-third-party-urls",
+      "status": "PASS",
+      "detail": "every absolute URL points at the project site (XML namespaces excluded)"
+    },
+    {
+      "name": "demo-provenance",
+      "status": "PASS",
+      "detail": "26 detail pages show demo provenance (no unlabelled content)"
+    },
+    {
+      "name": "no-migrated-records",
+      "status": "PASS",
+      "detail": "no migrated/legacy records or production identifiers in the build"
     },
     {
       "name": "explorer",

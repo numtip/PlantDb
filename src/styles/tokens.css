@@ -13,12 +13,13 @@
   --sage: #b9c99a;
   --sage-soft: #d8e0c6;
   --bronze: #c58d55;
-  --bronze-deep: #9c6a37;
+  --bronze-deep: #8f5f2e;  /* 4.92:1 on ivory (AA for small text) and as a button fill with ivory text */
+  --bronze-ink: #7d5023;   /* 5.4:1 on the bronze badge tint */
 
   /* derived text + lines (contrast-checked against ivory) */
   --ink: #1b2b24;          /* WCAG AA on ivory (13.6:1) */
   --ink-soft: #43554b;     /* AA on ivory (6.6:1) */
-  --muted: #66766c;        /* AA-large only — use for meta labels */
+  --muted: #5f6f65;        /* 4.79:1 on ivory — AA for small text */
   --line: rgba(23, 61, 50, 0.14);
   --line-strong: rgba(23, 61, 50, 0.28);
   --surface: #fffdf7;

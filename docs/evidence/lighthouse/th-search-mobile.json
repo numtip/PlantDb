@@ -1,0 +1,68 @@
+{
+  "id": "th-search-mobile",
+  "url": "http://127.0.0.1:8098/PlantDb/search/",
+  "formFactor": "mobile",
+  "fetchedAt": "2026-10-09T01:26:48.142Z",
+  "lighthouseVersion": "13.5.0",
+  "threshold": 90,
+  "scores": {
+    "performance": 100,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100
+  },
+  "passed": true,
+  "categoriesBelowThreshold": [],
+  "metrics": {
+    "first-contentful-paint": "1.4 s",
+    "largest-contentful-paint": "1.4 s",
+    "total-blocking-time": "0 ms",
+    "cumulative-layout-shift": "0.005",
+    "speed-index": "2.4 s",
+    "interactive": "1.4 s"
+  },
+  "failingAudits": [
+    {
+      "id": "first-contentful-paint",
+      "title": "First Contentful Paint",
+      "score": 0.97,
+      "displayValue": "1.4 s"
+    },
+    {
+      "id": "speed-index",
+      "title": "Speed Index",
+      "score": 0.98,
+      "displayValue": "2.4 s"
+    },
+    {
+      "id": "max-potential-fid",
+      "title": "Max Potential First Input Delay",
+      "score": 0.11,
+      "displayValue": "460 ms"
+    },
+    {
+      "id": "cache-insight",
+      "title": "Use efficient cache lifetimes",
+      "score": 0.5,
+      "displayValue": "Est savings of 13 KiB"
+    },
+    {
+      "id": "document-latency-insight",
+      "title": "Document request latency",
+      "score": 0.5,
+      "displayValue": "Est savings of 45 KiB"
+    },
+    {
+      "id": "network-dependency-tree-insight",
+      "title": "Network dependency tree",
+      "score": 0,
+      "displayValue": null
+    },
+    {
+      "id": "render-blocking-insight",
+      "title": "Render-blocking requests",
+      "score": 0.5,
+      "displayValue": null
+    }
+  ]
+}

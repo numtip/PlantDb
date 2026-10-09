@@ -1,0 +1,154 @@
+{
+  "generatedAt": "2026-10-09T01:27:28.507Z",
+  "threshold": 90,
+  "set": "full",
+  "urlCount": 8,
+  "runs": 16,
+  "allPassed": true,
+  "table": [
+    {
+      "id": "th-home-desktop",
+      "form": "desktop",
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100,
+      "passed": true
+    },
+    {
+      "id": "th-home-mobile",
+      "form": "mobile",
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100,
+      "passed": true
+    },
+    {
+      "id": "en-home-desktop",
+      "form": "desktop",
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100,
+      "passed": true
+    },
+    {
+      "id": "en-home-mobile",
+      "form": "mobile",
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100,
+      "passed": true
+    },
+    {
+      "id": "th-catalogue-desktop",
+      "form": "desktop",
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100,
+      "passed": true
+    },
+    {
+      "id": "th-catalogue-mobile",
+      "form": "mobile",
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100,
+      "passed": true
+    },
+    {
+      "id": "en-catalogue-desktop",
+      "form": "desktop",
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100,
+      "passed": true
+    },
+    {
+      "id": "en-catalogue-mobile",
+      "form": "mobile",
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100,
+      "passed": true
+    },
+    {
+      "id": "th-detail-desktop",
+      "form": "desktop",
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100,
+      "passed": true
+    },
+    {
+      "id": "th-detail-mobile",
+      "form": "mobile",
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100,
+      "passed": true
+    },
+    {
+      "id": "en-detail-desktop",
+      "form": "desktop",
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100,
+      "passed": true
+    },
+    {
+      "id": "en-detail-mobile",
+      "form": "mobile",
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100,
+      "passed": true
+    },
+    {
+      "id": "th-search-desktop",
+      "form": "desktop",
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100,
+      "passed": true
+    },
+    {
+      "id": "th-search-mobile",
+      "form": "mobile",
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100,
+      "passed": true
+    },
+    {
+      "id": "en-search-desktop",
+      "form": "desktop",
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100,
+      "passed": true
+    },
+    {
+      "id": "en-search-mobile",
+      "form": "mobile",
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100,
+      "passed": true
+    }
+  ]
+}

@@ -13,6 +13,7 @@
     "test:i18n": "node --experimental-strip-types scripts/test-i18n.mjs",
     "test:search": "node scripts/test-search.mjs",
     "qa": "node scripts/qa-site.mjs",
+    "lighthouse": "node scripts/lighthouse.mjs",
     "shots": "bash scripts/shots.sh"
   },
   "dependencies": {
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "lighthouse": "^13.5.0",
     "typescript": "^5.9.3"
   }
 }

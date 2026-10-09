@@ -2,8 +2,8 @@
 import '../styles/base.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { localeTags, ogLocales, useTranslations, type Locale } from '../i18n/ui';
-import { absoluteUrl, alternatePaths, localePath } from '../i18n/urls';
+import { localeTags, locales, ogLocales, useTranslations, type Locale } from '../i18n/ui';
+import { absoluteUrl, localePath, stripLocale } from '../i18n/urls';
 
 interface Props {
   locale: Locale;
@@ -20,7 +20,8 @@ const { locale, title, description, path = '', bodyClass = '', noindex = false }
 const t = useTranslations(locale);
 const pathname = Astro.url.pathname;
 const canonical = noindex ? null : absoluteUrl(locale, path);
-const alternates = noindex ? [] : alternatePaths(pathname);
+// hreflang must be absolute URLs (Lighthouse "hreflang" audit + Google guidance)
+const rest = stripLocale(pathname).rest;
 const ogImage = null; // no unapproved media is published; og:image intentionally omitted
 ---
 
@@ -33,10 +34,10 @@ const ogImage = null; // no unapproved media is published; og:image intentionall
     <meta name="description" content={description} />
     {noindex ? <meta name="robots" content="noindex, follow" /> : null}
     {canonical ? <link rel="canonical" href={canonical} /> : null}
-    {alternates.map((alt) => (
-      <link rel="alternate" hreflang={localeTags[alt.locale]} href={alt.href} />
+    {noindex ? null : locales.map((l) => (
+      <link rel="alternate" hreflang={localeTags[l]} href={absoluteUrl(l, rest)} />
     ))}
-    {canonical ? <link rel="alternate" hreflang="x-default" href={alternatePaths(pathname).find((a) => a.locale === 'th')!.href} /> : null}
+    {canonical ? <link rel="alternate" hreflang="x-default" href={absoluteUrl('th', rest)} /> : null}
     <meta name="theme-color" content="#173d32" />
     <meta name="color-scheme" content="light" />
     <meta property="og:type" content="website" />

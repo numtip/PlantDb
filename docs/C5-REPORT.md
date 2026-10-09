@@ -139,15 +139,26 @@ botanical translations; both locales pass functional and visual QA.
 
 ## 9. Known limits (stated, not hidden)
 
-1. **Lighthouse not measured** locally and not wired into CI — the ≥90 targets are therefore **not yet evidenced**. Recommended next step: add Lighthouse CI on the gated preview build.
+1. **Lighthouse is now measured** (16 runs, all categories 100) and enforced in CI — see `docs/QA-MATRIX.md`. Caveat: numbers come from a locally served static build; shared CI runners can report a point or two lower, which is why the gate asserts the ≥90 threshold rather than a fixed score.
 2. Client-side search over an embedded index: fine for the demo set and the ~166-record migrated catalogue, unproven at much larger scale.
 3. No pixel/visual-regression automation; visual QA is by screenshot review.
 4. Without JavaScript the catalogue degrades to an unfiltered list (all records still visible, no filtering).
 5. The demo catalogue is 13 records, so relevance ranking and facet behaviour are illustrative only.
 6. The stack (Astro + PostgreSQL Schema A) was approved by the owner in the C5 directive, but the C4-era Jev confidence for that stack was only 0.49 — if that is revisited, only the data layer is affected, not this front end.
 
-## 10. Recommended next step
+## 10. Pre-merge quality gate (2026-10-09)
 
-Owner review of PR #1 → design acceptance → then (a) wire Lighthouse CI against the gated
-preview, (b) integrate the real migrated dataset behind the localized content contract,
-(c) activate Pages only after explicit approval.
+A dedicated pre-merge gate was run on PR #1 and is documented in **`docs/QA-MATRIX.md`**:
+22 gate rows with the command and evidence file for each, a 16-run Lighthouse matrix (TH/EN ×
+desktop/mobile × 4 page types, every category 100), the eight defects it found and fixed
+(4× colour contrast, accessible-name mismatch, relative hreflang, heading order, plus a gate
+blind spot), and a 9/9 mutation test proving the gate fails when something real breaks.
+
+**Status: `READY_FOR_OWNER_MERGE_APPROVAL`** — nothing was merged, GitHub Pages stays
+unconfigured, the default branch was not changed, and no deployment was performed.
+
+## 11. Recommended next step
+
+Owner decision on PR #1 (merge? activate Pages? move the default branch to `main`?) → then
+(a) integrate the real migrated dataset behind the localized content contract, (b) re-run this
+same gate against the migrated content, (c) activate Pages only after explicit approval.
